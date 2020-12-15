@@ -1,0 +1,262 @@
+h1 { text-align: center; }
+h2 { text-align: center; }
+body {
+  font-family: Arial, Verdana, sans-serif;
+  font-size: 14px;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #336699;
+  background:url('/images/USCP-bg.jpg');
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: top center;
+  background-color: transparent;
+}
+.green {color: green;}
+.red {color: red;}
+.main {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0px;
+  width: 900px;
+  max-width: 100%;
+  min-width: 600px;
+  box-shadow: 0px 0px 12px #003366;
+}
+.text {
+  padding: 16px;
+  background-color: white;
+}
+.header {
+  padding: 8px;
+  color: #fff;
+  background: url('/images/bg-darkBlue-75.png') repeat;
+  background-color: transparent;
+  margin-right: auto;
+  margin-left: auto;
+  text-align: center;
+}
+.disclaimer {
+  width: 660px;
+  font-style: italic;
+  text-align: center;
+  margin-right: auto;
+  margin-left: auto;
+}
+div.header img {
+  display: inline-block;
+  padding: 8px;
+}
+table.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+.CSSTableGenerator {
+  margin-left: auto;
+  margin-right: auto;
+  padding:0px;
+  max-width:100%;
+  min-width:80%;
+  box-shadow: 5px 5px 5px #888888;
+  border:1px solid #000000;
+}
+tr.clickable { cursor: pointer; }
+td.clickable { cursor: pointer; }
+.chart {
+  margin-left: auto;
+  margin-right: auto;
+  width:90%;
+  height:400px;
+}
+.CSSTableGenerator table{
+  border-collapse:collapse;
+  border-spacing:0px;
+  width:100%;
+  height:100%;
+  margin:0px;
+  padding:0px;
+}
+.CSSTableGenerator tr { background-color:#aad4ff; }
+.CSSTableGenerator tr:nth-child(odd) { background-color:#aad4ff; }
+.CSSTableGenerator tr:nth-child(even) { background-color:#56aaff; }
+.CSSTableGenerator tr.clickable:hover { background-color:#004fdf; }
+.CSSTableGenerator td.clickable:hover { color:#aad4ff; }
+.CSSTableGenerator td{
+  vertical-align:middle;
+  border:1px solid #000000;
+  border-width:0px 1px 1px 0px;
+  text-align:left;
+  padding:7px;
+  font-size:12px;
+  font-family:Arial;
+  font-weight:normal;
+  color:#000000;
+}
+.CSSTableGenerator tr:last-child td{
+  border-width:0px 1px 0px 0px;
+}
+.CSSTableGenerator tr td:last-child{
+  border-width:0px 0px 1px 0px;
+}
+.CSSTableGenerator tr:last-child td:last-child{
+  border-width:0px 0px 0px 0px;
+}
+.CSSTableGenerator tr:first-child td{
+  background:-o-linear-gradient(bottom, #007fff 5%, #0000bf 100%);
+  background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #007fff), color-stop(1, #0000bf) );
+  background:-moz-linear-gradient( center top, #007fff 5%, #0000bf 100% );
+  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr="#007fff", endColorstr="#0000bf");
+  background: -o-linear-gradient(top,#007fff,0000bf);
+  background-color:#002fcf;
+  border:0px solid #000000;
+  text-align:center;
+  border-width:0px 1px 1px 0px;
+  font-size:14px;
+  font-family:Arial;
+  font-weight:bold;
+  color:#ffffff;
+}
+.CSSTableGenerator tr:first-child:hover td{
+  background:-o-linear-gradient(bottom, #007fff 5%, #0000bf 100%);
+  background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #007fff), color-stop(1, #0000bf) );
+  background:-moz-linear-gradient( center top, #007fff 5%, #0000bf 100% );
+  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr="#007fff", endColorstr="#0000bf");
+  background: -o-linear-gradient(top,#007fff,0000bf);
+  background-color:#002fcf;
+}
+.CSSTableGenerator tr:first-child td:first-child{
+  border-width:0px 1px 1px 0px;
+}
+.CSSTableGenerator tr:first-child td:last-child{
+  border-width:0px 0px 1px 0px;
+}
+
+.navbar {
+    background: url('/images/bg-darkBlue-75.png') repeat;
+    background-color: transparent;
+    //background:#022B4D;
+    padding:0px;
+    margin:0px;
+    float:top;
+    position:relative;
+    width:100%;
+    height:40px;
+    //z-index:2000;
+    //-moz-border-radius:8px;
+    //-webkit-border-radius:8px;
+    //border-radius: 8px;
+    overflow:visible;
+    
+}
+
+ul.nav{
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    position: relative;
+    float: left;
+    font-size: 16px;
+    font-weight: 700;
+}
+ul.nav li{
+  //background: url('/images/bg-darkBlue-75.png') repeat;
+  //background-color: transparent;
+    position:relative;
+    float: left;
+    padding: 0;
+    margin: 0px;
+    min-width: 180px;
+    text-align: center;
+    line-height: 40px;
+    display: block;
+    color: #fff;
+    //background: #022B4D;
+    text-decoration: none;
+}
+ul.nav li a{
+    display:block;
+    color: #fff;
+    text-decoration: none;
+    padding: 0;
+}
+ul.nav > li:hover > a{
+    color: #fff;
+    text-decoration: none;
+}
+ul.nav li:hover{
+    color: #fff;
+    background: url('/images/bg-darkBlue-75.png') repeat;
+}
+ul.nav li:hover ul li:hover > a{
+    color: #fff;
+    text-decoration: none;
+}
+ul.nav li ul{
+    padding: 0;
+    display: none;
+    position: absolute;
+}
+ul.nav li:hover ul{
+    background: url('/images/bg-darkBlue-75.png') repeat;
+    padding: 0;
+    display: block;
+    position: absolute;
+    float: left;
+}
+
+/*
+ul.nav li:hover ul > li{
+    padding: 0;
+    display: inline-block;
+    float: left;
+}
+
+/*
+.nav ul ul{ display:none; }
+
+.nav ul li ul{ display:block; }
+
+.nav ul{
+  padding:0 20px;
+  border-radius:10px;
+  list-style:none;
+  position:relative;
+  display: inline-block;
+  background: linear-gradient(top, #efefef 0%, #bbbbbb 100%);
+  background: -moz-linear-gradient(top, #efefef 0%, #bbbbbb 100%);
+  background: -webkit-linear-gradient(top, #efefef 0%, #bbbbbb 100%);
+  box-shadow: 0px 0px 9px rgba(0,0,0,0.15);
+}
+
+.nav ul li { float: left; }
+
+.nav u l li a {
+  padding: 5px 10px 5px 10px;
+  display: block;
+  color: #757575;
+  text-decoration: none;
+}
+
+.nav ul li:hover{
+  background: #4b545f;
+  background: linear-gradient(top, #4f5964 0%, #5f6975 40%);
+  background: -moz-linear-gradient(top, #4f5964 0%, #5f6975 40%);
+  background: -webkit-linear-gradient(top, #4f5964 0%, #5f6975 40%);
+}
+
+.nav ul li:hover a{
+  clolor: #fff;
+}
+
+.nav ul li:hover > ul { margin:0px; padding:0px; }
+.nav ul li:hover > ul li { float:none; display:block; }
+.nav ul li:hover > ul li a { color: #666; min-width:150px; }
+.nav ul li:hover > ul li a:hover { color #fff; }
+
+.nav ul li { position:relative;}
+.nav ul li ul { polistion:absolute; top:30px; left:30px; }
+*/
