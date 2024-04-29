@@ -111,33 +111,33 @@ root@dns_server:/usr/src/app#
 
 From here we can interactively control the two endpoints on our network. At this time, the router containers are acting are intermediate couriers that move packets across the network and do not need any extra control by us.
 
-<table>
+<table border='1'>
     <tr>
         <th><h3>Server (running <a href="/cybersecurity-containerlabs/command-control/dns_tunneling/server/malicious_resolver.py"><code>malcious_resolver.py</code></a>)</h3></th>
         <th><h3>Client (running <a href="/cybersecurity-containerlabs/command-control/dns_tunneling/client/dns_lookup.py"><code>dns_lookup.py</code></a>)</h3></th>
     </tr>
     <tr>
-        <td>
+        <td width="50%">
             Start the malicious resolver.
             <pre>root@dns_server:/usr/src/app# python malicious_resolver.py</pre>
         </td>
-        <td>
+        <td width="50%">
             Start DNS lookup requests.
             <pre>root@workstation-1:/usr/src/app# python dns_lookup.py</pre>
         </td>
     </tr>
     <tr>
-        <td>
+        <td width="50%">
             Notice that we now have a shell and that the hostname of the endpoint we have a shell to is printed (ex. <code>workstation-1</code>).
             <pre>root@dns_server:/usr/src/app# python malicious_resolver.py 
 workstation-1
 shell> </pre>
         </td>
-        <td>
+        <td width="50%">
         </td>
     </tr>
     <tr>
-        <td>
+        <td width="50%">
             Now we can issue a command to run on the workstation endpoint (ex. <code>ls</code>).
             <pre>root@dns_server:/usr/src/app# python malicious_resolver.py 
 workstation-1
@@ -149,11 +149,11 @@ dns_lookup.py
 requirements.txt</pre>
         From here you can continue to issue commands until you are satisfied and want to terminate the DNS tunneling session.
         </td>
-        <td>
+        <td width="50%">
         </td>
     </tr>
     <tr>
-        <td>
+        <td width="50%">
             Lets try issuing the <code>exit</code> command to exit the shell. Our specific implementation does not allow for the <code>exit command</code> and instead we are told to use <code>CTRL+C</code>.
             <pre>root@dns_server:/usr/src/app# python malicious_resolver.py 
 workstation-1
@@ -170,7 +170,7 @@ Detected CTRL+C. Exiting now.
 root@dns_server:/usr/src/app#</pre>
         At this point, we are returned to our shell on the DNS server.
         </td>
-        <td>
+        <td width="50%">
         On the DNS requesting side we can also terminate it from running by doing <code>CTRL+C</code>.
 <pre>root@workstation-1:/usr/src/app# python dns_lookup.py 
 ^C
@@ -185,17 +185,17 @@ root@workstation-1:/usr/src/app#</pre>
 One way to confirm that we are communicating successfully between the "compromised" host and the C2 server is by looking at packets that are transferred across the network. To do this, we can use the [`tshark`](https://tshark.dev) tool to capture packets. A shell script called `capture.sh` will be available on the client. This shell script will run the typical `dns_lookup.py` Python file from the previous example, while also simulatenously starting `tshark` capture on the client. The [`capture.sh`](/cybersecurity-containerlabs/command-control/dns_tunneling/client/capture.sh) file can be inspected using this hyperlink if you are curious.
 
 ### Starting Capture
-<table>
+<table border='1'>
     <tr>
         <th><h3>Server (running <a href="/cybersecurity-containerlabs/command-control/dns_tunneling/server/malicious_resolver.py"><code>malcious_resolver.py</code></a>)</h3></th>
         <th><h3>Client (running <a href="/cybersecurity-containerlabs/command-control/dns_tunneling/client/capture.sh"><code>capture.sh</code></a>)</h3></th>
     </tr>
     <tr>
-        <td>
+        <td width="50%">
             Start the malicious resolver.
             <pre>root@dns_server:/usr/src/app# python malicious_resolver.py</pre>
         </td>
-        <td>
+        <td width="50%">
             Start capture.
             <pre>root@workstation-1:/usr/src/app# ./capture.sh 
 Running as user "root" and group "root". This could be dangerous.
@@ -205,7 +205,7 @@ Capturing on 'eth0'
         </td>
     </tr>
     <tr>
-        <td>
+        <td width="50%">
             Just like before, we have the terminal of our workstation and can start to issue commands. (ex. <code>ls</code>).
             <pre>root@dns_server:/usr/src/app# python malicious_resolver.py
 workstation-1
@@ -216,7 +216,7 @@ captures
 dns_lookup.py
 requirements.txt</pre>
         </td>
-        <td>
+        <td width="50%">
         From here, we should notice that packets have been collected on the client. At the bottom of the <code>tshark</code> capture output we can see a count for the number of packets collected. <b>This number is bolded in the snippet.</b>
         <pre>root@workstation-1:/usr/src/app# ./capture.sh 
 Running as user "root" and group "root". This could be dangerous.
@@ -227,7 +227,7 @@ Capturing on 'eth0'
         </td>
     </tr>
     <tr>
-        <td>
+        <td width="50%">
             Use <code>CTRL+C</code> to exit.
             <pre>root@dns_server:/usr/src/app# python malicious_resolver.py 
 workstation-1
@@ -242,7 +242,7 @@ Detected CTRL+C. Exiting now.
 root@dns_server:/usr/src/app#</pre>
         At this point, we are returned to our shell on the DNS server.
         </td>
-        <td>
+        <td width="50%">
         On the client side we can also terminate packet capture from <code>tshark</code> by doing <code>CTRL+C</code>.
 <pre>root@workstation-1:/usr/src/app# ./capture.sh 
 Running as user "root" and group "root". This could be dangerous.
