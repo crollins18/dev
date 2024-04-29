@@ -1,0 +1,6 @@
+clab-dns-tunneling/*
+client/captures/*.pcap
+client/captures/*.pcapng
+server/captures/*.pcap
+server/captures/*.pcapng
+*.bak
