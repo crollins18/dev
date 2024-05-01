@@ -28,13 +28,13 @@ Before proceeding make sure you meet these requirements.
     ```
     ┌──(ccrollin㉿thinkbox)-[~/cybersecurity-containerlabs/command-control/dns_tunneling]
     └─$ make build
-    docker build -t dns_server ./server
+    docker build -t dns-server ./server
     Sending build context to Docker daemon  8.704kB
 
     (... more build steps here...)
 
     Successfully built a41caf166072
-    Successfully tagged dns_server:latest
+    Successfully tagged dns-server:latest
 
     docker build -t workstation ./client
     Sending build context to Docker daemon  19.97kB
@@ -57,14 +57,14 @@ INFO[0000] Parsing & checking topology file: dns-tunneling.clab.yml
 INFO[0000] Removing /home/ccrollin/cybersecurity-containerlabs/command-control/dns_tunneling/clab-dns-tunneling directory... 
 INFO[0000] Creating docker network: Name="clab", IPv4Subnet="172.20.20.0/24", IPv6Subnet="2001:172:20:20::/64", MTU=1500 
 INFO[0000] Creating lab directory: /home/ccrollin/cybersecurity-containerlabs/command-control/dns_tunneling/clab-dns-tunneling
-INFO[0000] Creating container: "dns_server"
+INFO[0000] Creating container: "dns-server"
 INFO[0000] Creating container: "home-router"
 INFO[0000] Creating container: "company-router"
 INFO[0002] Running postdeploy actions for Nokia SR Linux 'company-router' node
-INFO[0002] Created link: dns_server:eth1 <--> home-router:e1-1
+INFO[0002] Created link: dns-server:eth1 <--> home-router:e1-1
 INFO[0002] Created link: company-router:e1-2 <--> home-router:e1-2
 INFO[0002] Running postdeploy actions for Nokia SR Linux 'home-router' node
-INFO[0003] node "dns_server" turned healthy, continuing
+INFO[0003] node "dns-server" turned healthy, continuing
 INFO[0003] Creating container: "workstation-1"
 INFO[0003] Created link: workstation-1:eth1 <--> company-router:e1-1
 INFO[0026] Adding containerlab host entries to /etc/hosts file
@@ -77,11 +77,11 @@ To get more information about the containers running you can run `docker ps` to 
 └─$ docker ps
 CONTAINER ID   IMAGE                   COMMAND                  CREATED         STATUS                   PORTS                                   NAMES
 0ee611e570ce   workstation:latest      "python3"                7 minutes ago   Up 7 minutes                                                     clab-dns-tunneling-workstation-1
-832341f0a80c   dns_server:latest       "python3"                7 minutes ago   Up 7 minutes (healthy)   0.0.0.0:5053->53/tcp, :::5053->53/tcp   clab-dns-tunneling-dns_server
+832341f0a80c   dns-server:latest       "python3"                7 minutes ago   Up 7 minutes (healthy)   0.0.0.0:5053->53/tcp, :::5053->53/tcp   clab-dns-tunneling-dns-server
 90e74c8e13ce   ghcr.io/nokia/srlinux   "/tini -- fixuid -q …"   7 minutes ago   Up 7 minutes                                                     clab-dns-tunneling-home-router
 62036128be3f   ghcr.io/nokia/srlinux   "/tini -- fixuid -q …"   7 minutes ago   Up 7 minutes                                                     clab-dns-tunneling-company-router
 ```
-Notice that we have 4 (four) containers with names `clab-dns-tunneling-company-router`, `clab-dns-tunneling-dns_server`, `clab-dns-tunneling-home-router`, and `clab-dns-tunneling-workstation-1`
+Notice that we have 4 (four) containers with names `clab-dns-tunneling-company-router`, `clab-dns-tunneling-dns-server`, `clab-dns-tunneling-home-router`, and `clab-dns-tunneling-workstation-1`
 
 The network topology can be visualized as such. We can think of an attacker who setups up the (malicious) DNS server on their home network. To reach the internet, the DNS server is connected to their home router. The link between the home router and the company router represents the logical connection these two routers would have provided by the internet. 
 
@@ -101,12 +101,12 @@ docker exec -it clab-dns-tunneling-workstation-1 /bin/bash
 root@workstation-1:/usr/src/app# 
 ```
 
-#### Running `bash` on the `clab-dns-tunneling-dns_server` Container
+#### Running `bash` on the `clab-dns-tunneling-dns-server` Container
 ```
 ┌──(ccrollin㉿thinkbox)-[~/cybersecurity-containerlabs/command-control/dns_tunneling]
 └─$ make terminal-server
-docker exec -it clab-dns-tunneling-dns_server /bin/bash
-root@dns_server:/usr/src/app# 
+docker exec -it clab-dns-tunneling-dns-server /bin/bash
+root@dns-server:/usr/src/app# 
 ```
 
 From here we can interactively control the two endpoints on our network. At this time, the router containers are acting are intermediate couriers that move packets across the network and do not need any extra control by us.
@@ -119,7 +119,7 @@ From here we can interactively control the two endpoints on our network. At this
     <tr>
         <td width="50%">
             Start the malicious resolver.
-            <pre>root@dns_server:/usr/src/app# python malicious_resolver.py</pre>
+            <pre>root@dns-server:/usr/src/app# python malicious_resolver.py</pre>
         </td>
         <td width="50%">
             Start DNS lookup requests.
@@ -129,7 +129,7 @@ From here we can interactively control the two endpoints on our network. At this
     <tr>
         <td width="50%">
             Notice that we now have a shell and that the hostname of the endpoint we have a shell to is printed (ex. <code>workstation-1</code>).
-            <pre>root@dns_server:/usr/src/app# python malicious_resolver.py 
+            <pre>root@dns-server:/usr/src/app# python malicious_resolver.py 
 workstation-1
 shell> </pre>
         </td>
@@ -139,7 +139,7 @@ shell> </pre>
     <tr>
         <td width="50%">
             Now we can issue a command to run on the workstation endpoint (ex. <code>ls</code>).
-            <pre>root@dns_server:/usr/src/app# python malicious_resolver.py 
+            <pre>root@dns-server:/usr/src/app# python malicious_resolver.py 
 workstation-1
 shell> ls
 Dockerfile
@@ -155,7 +155,7 @@ requirements.txt</pre>
     <tr>
         <td width="50%">
             Lets try issuing the <code>exit</code> command to exit the shell. Our specific implementation does not allow for the <code>exit command</code> and instead we are told to use <code>CTRL+C</code>.
-            <pre>root@dns_server:/usr/src/app# python malicious_resolver.py 
+            <pre>root@dns-server:/usr/src/app# python malicious_resolver.py 
 workstation-1
 shell> ls
 Dockerfile
@@ -167,7 +167,7 @@ shell> exit
 To exit, use CTRL+C.
 shell> ^C
 Detected CTRL+C. Exiting now.
-root@dns_server:/usr/src/app#</pre>
+root@dns-server:/usr/src/app#</pre>
         At this point, we are returned to our shell on the DNS server.
         </td>
         <td width="50%">
@@ -193,7 +193,7 @@ One way to confirm that we are communicating successfully between the "compromis
     <tr>
         <td width="50%">
             Start the malicious resolver.
-            <pre>root@dns_server:/usr/src/app# python malicious_resolver.py</pre>
+            <pre>root@dns-server:/usr/src/app# python malicious_resolver.py</pre>
         </td>
         <td width="50%">
             Start capture.
@@ -207,7 +207,7 @@ Capturing on 'eth0'
     <tr>
         <td width="50%">
             Just like before, we have the terminal of our workstation and can start to issue commands. (ex. <code>ls</code>).
-            <pre>root@dns_server:/usr/src/app# python malicious_resolver.py
+            <pre>root@dns-server:/usr/src/app# python malicious_resolver.py
 workstation-1
 shell> ls
 Dockerfile
@@ -229,7 +229,7 @@ Capturing on 'eth0'
     <tr>
         <td width="50%">
             Use <code>CTRL+C</code> to exit.
-            <pre>root@dns_server:/usr/src/app# python malicious_resolver.py 
+            <pre>root@dns-server:/usr/src/app# python malicious_resolver.py 
 workstation-1
 shell> ls
 Dockerfile
@@ -239,7 +239,7 @@ dns_lookup.py
 requirements.txt
 shell> ^C
 Detected CTRL+C. Exiting now.
-root@dns_server:/usr/src/app#</pre>
+root@dns-server:/usr/src/app#</pre>
         At this point, we are returned to our shell on the DNS server.
         </td>
         <td width="50%">
@@ -296,7 +296,7 @@ INFO[0000] Destroying lab: dns-tunneling
 INFO[0001] Removed container: clab-dns-tunneling-workstation-1 
 INFO[0001] Removed container: clab-dns-tunneling-company-router 
 INFO[0001] Removed container: clab-dns-tunneling-home-router 
-INFO[0001] Removed container: clab-dns-tunneling-dns_server 
+INFO[0001] Removed container: clab-dns-tunneling-dns-server 
 INFO[0001] Removing containerlab host entries from /etc/hosts file 
 INFO[0001] Removing ssh config for containerlab nodes   
 WARN[0002] errors during iptables rules removal: not available 

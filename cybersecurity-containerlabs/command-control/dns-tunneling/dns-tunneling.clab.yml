@@ -22,11 +22,11 @@ topology:
       stages:
         create:
           wait-for:
-            - node: dns_server
+            - node: dns-server
               stage: healthy
-    dns_server:
+    dns-server:
       kind: linux
-      image: dns_server:latest
+      image: dns-server:latest
       ports:
       - ${DNSSERVER_HOST_PORT:=5053}:${DNSSERVER_CONTAINER_PORT:=53}
       binds:
@@ -41,5 +41,5 @@ topology:
           - cat /etc/os-release
   links:
     - endpoints: ["workstation-1:eth1","company-router:e1-1"]
-    - endpoints: ["dns_server:eth1", "home-router:e1-1"]
+    - endpoints: ["dns-server:eth1", "home-router:e1-1"]
     - endpoints: ["company-router:e1-2", "home-router:e1-2"]

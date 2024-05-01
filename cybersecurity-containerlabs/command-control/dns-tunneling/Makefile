@@ -1,5 +1,5 @@
 build:
-	docker build -t dns_server ./server
+	docker build -t dns-server ./server
 	docker build -t workstation ./client
 run:
 	sudo containerlab deploy --reconfigure
@@ -12,4 +12,4 @@ force-destroy:
 terminal-client:
 	docker exec -it clab-dns-tunneling-workstation-1 /bin/bash
 terminal-server:
-	docker exec -it clab-dns-tunneling-dns_server /bin/bash
+	docker exec -it clab-dns-tunneling-dns-server /bin/bash
