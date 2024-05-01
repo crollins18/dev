@@ -18,8 +18,9 @@ description: >
 # add a line comment on "theme: minima" above.
 remote_theme: jekyll/minima
 
-# plugins:
-#   - jekyll-seo-tag
+plugins:
+  - jekyll-seo-tag
+  - jekyll-feed
 
 # Theme-specific settings
 
