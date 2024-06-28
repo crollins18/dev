@@ -1,9 +1,7 @@
 ---
 layout: default
-permalink: /cybersecurity-containerlabs/command-control/dns-tunneling/
+permalink: /dns-tunneling/
 ---
-[[Back to Command and Control]](/cybersecurity-containerlabs/command-control)
-
 # DNS Tunneling
 
 ## Abstract
@@ -20,13 +18,13 @@ Before proceeding make sure you meet these requirements.
 - Have [containerlab](https://containerlab.dev/install) installed
 
 ### Installation Steps
-1. Clone [the repository](https://github.com/crollins18/cybersecurity-containerlabs) using `git clone`
-2. Change directory into the path `command-control/dns-tunneling`
+1. Clone [the repository](https://github.com/crollins18/dev) using `git clone`
+2. Change directory into the path `dns-tunneling`
 3. Change any of the environment variables in `client/.env` or `server/.env` as you want for your lab. **Note: these values should match between the two files!**
 4. Build the custom images for the `client` and `server` containers by running `make build`. Your terminal output should look similar to the following.
 
     ```
-    ┌──(ccrollin㉿thinkbox)-[~/cybersecurity-containerlabs/command-control/dns-tunneling]
+    ┌──(ccrollin㉿thinkbox)-[~/dev/dns-tunneling]
     └─$ make build
     docker build -t dns-server ./server
     Sending build context to Docker daemon  8.704kB
@@ -48,15 +46,15 @@ Before proceeding make sure you meet these requirements.
 ## Starting the Containers
 Now that the containers are built, you can now run the containerlab using the `make run` script. **You will be asked to authenticate because containerlab requires sudo permissions**. Your terminal output should resemble to snippet below.
 ```
-┌──(ccrollin㉿thinkbox)-[~/cybersecurity-containerlabs/command-control/dns-tunneling]
+┌──(ccrollin㉿thinkbox)-[~/dev/dns-tunneling]
 └─$ make run
 sudo containerlab deploy --reconfigure
 [sudo] password for ccrollin: 
 INFO[0000] Containerlab v0.52.0 started                 
 INFO[0000] Parsing & checking topology file: dns-tunneling.clab.yml 
-INFO[0000] Removing /home/ccrollin/cybersecurity-containerlabs/command-control/dns-tunneling/clab-dns-tunneling directory... 
+INFO[0000] Removing /home/ccrollin/dns-tunneling/clab-dns-tunneling directory... 
 INFO[0000] Creating docker network: Name="clab", IPv4Subnet="172.20.20.0/24", IPv6Subnet="2001:172:20:20::/64", MTU=1500 
-INFO[0000] Creating lab directory: /home/ccrollin/cybersecurity-containerlabs/command-control/dns-tunneling/clab-dns-tunneling
+INFO[0000] Creating lab directory: /home/ccrollin/dns-tunneling/clab-dns-tunneling
 INFO[0000] Creating container: "dns-server"
 INFO[0000] Creating container: "home-router"
 INFO[0000] Creating container: "company-router"
@@ -73,7 +71,7 @@ INFO[0026] Adding ssh config for containerlab nodes
 
 To get more information about the containers running you can run `docker ps` to see container IDs, names, exposed ports, and current processes they are running. Below is a sample of what `docker ps` should return after calling `make run`.
 ```
-┌──(ccrollin㉿thinkbox)-[~/cybersecurity-containerlabs/command-control/dns-tunneling]
+┌──(ccrollin㉿thinkbox)-[~/dev/dns-tunneling]
 └─$ docker ps
 CONTAINER ID   IMAGE                   COMMAND                  CREATED         STATUS                   PORTS                                   NAMES
 0ee611e570ce   workstation:latest      "python3"                7 minutes ago   Up 7 minutes                                                     clab-dns-tunneling-workstation-1
@@ -88,14 +86,14 @@ The network topology can be visualized as such. We can think of an attacker who 
 In a situation where we assume apriori an attacker has gained initial access to the comporate workstation, they will need to move the data off the workstation in an established channel that is persisted for long term use. This is where DNS tunneling comes in to replace the initial (and often trivial) method of access to data.
 
 Because the attacker controls the workstation, they can make the workstation ask for DNS record requests over the internet to our special DNS server (rather than the corporate DNS servers).
-<p align="center"><img src="/cybersecurity-containerlabs/command-control/dns-tunneling/tutorial/network-topology.png" alt="network topology graphy" width="650"/></p>
+<p align="center"><img src="/dns-tunneling/tutorial/network-topology.png" alt="network topology graphy" width="650"/></p>
 
 ## Running our Simulation
 To access the server and workstation Linux containers, we will run the `bash` terminal on each one so we then issue more commands. To do this, use `make terminal-client` and `make terminal-server` as seen below:
 
 #### Running `bash` on the `clab-dns-tunneling-workstation-1` Container
 ```
-┌──(ccrollin㉿thinkbox)-[~/cybersecurity-containerlabs/command-control/dns-tunneling]
+┌──(ccrollin㉿thinkbox)-[~/dev/dns-tunneling]
 └─$ make terminal-client
 docker exec -it clab-dns-tunneling-workstation-1 /bin/bash
 root@workstation-1:/usr/src/app# 
@@ -103,7 +101,7 @@ root@workstation-1:/usr/src/app#
 
 #### Running `bash` on the `clab-dns-tunneling-dns-server` Container
 ```
-┌──(ccrollin㉿thinkbox)-[~/cybersecurity-containerlabs/command-control/dns-tunneling]
+┌──(ccrollin㉿thinkbox)-[~/dev/dns-tunneling]
 └─$ make terminal-server
 docker exec -it clab-dns-tunneling-dns-server /bin/bash
 root@dns-server:/usr/src/app# 
@@ -113,8 +111,8 @@ From here we can interactively control the two endpoints on our network. At this
 
 <table border='1'>
     <tr>
-        <th><h3>Server (running <a href="/cybersecurity-containerlabs/command-control/dns-tunneling/server/malicious_resolver.py"><code>malcious_resolver.py</code></a>)</h3></th>
-        <th><h3>Client (running <a href="/cybersecurity-containerlabs/command-control/dns-tunneling/client/dns_lookup.py"><code>dns_lookup.py</code></a>)</h3></th>
+        <th><h3>Server (running <a href="/dns-tunneling/server/malicious_resolver.py"><code>malcious_resolver.py</code></a>)</h3></th>
+        <th><h3>Client (running <a href="/dns-tunneling/client/dns_lookup.py"><code>dns_lookup.py</code></a>)</h3></th>
     </tr>
     <tr>
         <td width="50%">
@@ -182,13 +180,13 @@ root@workstation-1:/usr/src/app#</pre>
 </table>
 
 ## Packet Capture
-One way to confirm that we are communicating successfully between the "compromised" host and the C2 server is by looking at packets that are transferred across the network. To do this, we can use the [`tshark`](https://tshark.dev) tool to capture packets. A shell script called `capture.sh` will be available on the client. This shell script will run the typical `dns_lookup.py` Python file from the previous example, while also simulatenously starting `tshark` capture on the client. The [`capture.sh`](/cybersecurity-containerlabs/command-control/dns-tunneling/client/capture.sh) file can be inspected using this hyperlink if you are curious.
+One way to confirm that we are communicating successfully between the "compromised" host and the C2 server is by looking at packets that are transferred across the network. To do this, we can use the [`tshark`](https://tshark.dev) tool to capture packets. A shell script called `capture.sh` will be available on the client. This shell script will run the typical `dns_lookup.py` Python file from the previous example, while also simulatenously starting `tshark` capture on the client. The [`capture.sh`](/dns-tunneling/client/capture.sh) file can be inspected using this hyperlink if you are curious.
 
 ### Starting Capture
 <table border='1'>
     <tr>
-        <th><h3>Server (running <a href="/cybersecurity-containerlabs/command-control/dns-tunneling/server/malicious_resolver.py"><code>malcious_resolver.py</code></a>)</h3></th>
-        <th><h3>Client (running <a href="/cybersecurity-containerlabs/command-control/dns-tunneling/client/capture.sh"><code>capture.sh</code></a>)</h3></th>
+        <th><h3>Server (running <a href="/dns-tunneling/server/malicious_resolver.py"><code>malcious_resolver.py</code></a>)</h3></th>
+        <th><h3>Client (running <a href="/dns-tunneling/client/capture.sh"><code>capture.sh</code></a>)</h3></th>
     </tr>
     <tr>
         <td width="50%">
@@ -264,7 +262,7 @@ All packets captures are stored by default in a file named `capture.pcapng` on t
 Here are the 13 packets that we captured. Notice the DNS queries and responses, both with a Base64 encoded string as a zone record.
 
 ```
-┌──(ccrollin㉿thinkbox)-[~/cybersecurity-containerlabs/command-control/dns-tunneling]
+┌──(ccrollin㉿thinkbox)-[~/dev/dns-tunneling]
 └─$ tshark -r client/captures/capture.pcapng
     1 0.000000000  172.20.20.4 → 172.20.20.5  DNS 116 Standard query response 0xbe4f A d29ya3N0YXRpb24tMQo=.mydomain.local A 172.20.20.4
     2 0.004345400  172.20.20.5 → 172.20.20.4  DNS 107 Standard query 0xa30a A RG9ja2VyZmlsZQpjYXB0dXJlLnNoCmNh.mydomain.local
@@ -282,12 +280,12 @@ Here are the 13 packets that we captured. Notice the DNS queries and responses, 
 ```
 
 #### Packet Capture File
-A sample packet capture file can be downloaded at [`tutorial/dns-tunneling.pcapng`](/cybersecurity-containerlabs/command-control/dns-tunneling/tutorial/dns-tunneling.pcapng).
+A sample packet capture file can be downloaded at [`tutorial/dns-tunneling.pcapng`](/dns-tunneling/tutorial/dns-tunneling.pcapng).
 
 ## Stopping the Simulation
 When you are done with the simulation, you can stop the containerlab, using the `make destroy` script file. **You will be asked to authenticate because containerlab requires sudo permissions**. Your terminal output should resemble to snippet below.
 ```
-┌──(ccrollin㉿thinkbox)-[~/cybersecurity-containerlabs/command-control/dns-tunneling]
+┌──(ccrollin㉿thinkbox)-[~/dev/dns-tunneling]
 └─$ make destroy
 sudo containerlab destroy
 INFO[0000] Parsing & checking topology file: dns-tunneling.clab.yml 
