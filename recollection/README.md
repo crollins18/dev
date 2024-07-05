@@ -513,5 +513,3 @@ Looking at the top 10 visited domains, we see the following.
 `csrsss.exe9541153d0e2cd21bdae11591f6be48407f896b75e1320628346b03.exe`
 
 This file is trying to mimic the builtin Windows file `csrsss.exe`, which deals with [Client/Server Runtime Subsystem](https://en.wikipedia.org/wiki/Client/Server_Runtime_Subsystem) (usually located inside the `System32` directory).
-
----
