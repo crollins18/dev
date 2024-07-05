@@ -1,13 +1,13 @@
 ---
-layout: default
 permalink: /recollection/
+layout: page
 ---
 # HTB Sherlock - Recollection
 
 ### Question 1 & 2
 ---
-`file recollection.bin`
 ```
+ccrollin@thinkpad-p43s:~/.../recollection$ file recollection.bin
 recollection.bin: data
 ```
 

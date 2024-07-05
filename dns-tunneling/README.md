@@ -1,6 +1,6 @@
 ---
-layout: default
 permalink: /dns-tunneling/
+layout: page
 ---
 # DNS Tunneling
 
