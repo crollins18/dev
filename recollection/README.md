@@ -5,7 +5,6 @@ layout: page
 # HTB Sherlock - Recollection
 
 ### Question 1 & 2
----
 ```
 ccrollin@thinkpad-p43s:~/.../recollection$ file recollection.bin
 recollection.bin: data
@@ -29,7 +28,6 @@ recollection.bin: data
 ---
 
 ### Question 3
----
 `volatility --profile=Win7SP1x64 clipboard -f recollection.bin`
 
 ```
@@ -43,7 +41,6 @@ Session    WindowStation Format                         Handle Object           
 ---
 
 ### Question 4
----
 `volatility --profile=Win7SP1x64 consoles -f recollection.bin`
 
 ```
@@ -56,7 +53,6 @@ A quick Google search finds that [`iex` is a common abbreviation/alias for the `
 ---
 
 ### Question 5 & 6
----
 `volatility --profile=Win7SP1x64 consoles -f recollection.bin`
 
 ```
@@ -72,7 +68,6 @@ ass.txt
 ---
 
 ### Question 7
----
 `volatility --profile=Win7SP1x64 consoles -f recollection.bin`
 ```
 PS C:\Users\user> powershell -e "ZWNobyAiaGFja2VkIGJ5IG1hZmlhIiA+ICJDOlxVc2Vyc1x
@@ -89,7 +84,6 @@ echo "hacked by mafia" > "C:\Users\Public\Office\readme.txt"
 ---
 
 ### Question 8 & 9
----
 `volatility --profile=Win7SP1x64 consoles -f recollection.bin`
 ```
 PS C:\Users\user> net users                                                                                             
@@ -107,7 +101,6 @@ The command completed successfully.
 ---
 
 ### Question 10
----
 `volatility --profile=Win7SP1x64 filescan -f recollection.bin`
 ```
 ccrollin@thinkpad-p43s:~/.../recollection$ grep 'password' filescan.recollection.txt 
@@ -119,7 +112,6 @@ ccrollin@thinkpad-p43s:~/.../recollection$ grep 'password' filescan.recollection
 ---
 
 ### Question 11, 12, & 13
----
 `volatility --profile=Win7SP1x64 consoles -f recollection.bin`
 ```
 PS C:\Users\user\Downloads> ls                                                  
@@ -161,7 +153,6 @@ Now look at the **History** heading in VirusTotal for the **Creation Time** - `2
 ---
 
 ### Question 14
----
 `volatility --profile=Win7SP1x64 netscan -f recollection.bin`
 ```
 Offset(P)          Proto    Local Address                  Foreign Address      State            Pid      Owner          Created
@@ -246,7 +237,6 @@ The local IP address of the machine is `192.168.0.104`
 ---
 
 ### Question 15
----
 `volatility --profile=Win7SP1x64 pstree -f recollection.bin`
 ```
 Name                                                  Pid   PPid   Thds   Hnds Time
@@ -259,7 +249,6 @@ Parent process is `cmd.exe`.
 ---
 
 ### Question 16
----
 `grep -E -o "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}\b" edge_dump/strings.2380.dmp`
 ```
 gmail.commafia_code1337@gmail.comc
@@ -477,7 +466,6 @@ Email used in Edge is `mafia_code1337@gmail.com`.
 ---
 
 ### Question 17
----
 `volatility -f recollection.bin --profile=Win7SP1x64 memdump -p 2380 -D edge-dump/`
 
 We now have `edge_dump/2380.dmp` as a process dump file.
@@ -512,7 +500,6 @@ Looking at the top 10 visited domains, we see the following.
 ---
 
 ### Question 18
----
 `volatility --profile=Win7SP1x64 filescan -f recollection.bin`
 `grep "\\Downloads.*\.exe" filescan.recollection.txt`
 ```
