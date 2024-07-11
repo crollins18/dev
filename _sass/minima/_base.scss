@@ -198,13 +198,15 @@ pre {
  * Wrapper
  */
 .wrapper {
-  margin-right: 15em;
-  margin-left: 15em;
+  max-width: calc(#{$content-width} - (#{$spacing-unit}));
+  margin-right: auto;
+  margin-left: auto;
   padding-right: $spacing-unit * .5;
   padding-left: $spacing-unit * .5;
   @extend %clearfix;
 
   @media screen and (min-width: $on-large) {
+    max-width: calc(#{$content-width} - (#{$spacing-unit} * 2));
     padding-right: $spacing-unit;
     padding-left: $spacing-unit;
   }
