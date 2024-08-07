@@ -279,8 +279,55 @@ Here are the 13 packets that we captured. Notice the DNS queries and responses, 
    13 5.055741314 02:42:ac:14:14:05 → 02:42:ac:14:14:04 ARP 42 172.20.20.5 is at 02:42:ac:14:14:05
 ```
 
+Lets examine the domain queries (and their responses). The lab is setup to encode the data we send across the network in base64. Like I hinted at in the introduction, more robust methods could be used (ie. encryption) to ensure only intended parties can read the data but for instructional purposes base64 offers a nice way to easily decode (but that means a sys admin sniffing packets like us could also see them...hehe) In this implementation the data is prepended as a "subdomain" to the default root domain `mydomain.local` (from our .env files) when we make our phony DNS queries.
+
+```
+d29ya3N0YXRpb24tMQo=.mydomain.local
+RG9ja2VyZmlsZQpjYXB0dXJlLnNoCmNh.mydomain.local
+cHR1cmVzCmRuc19sb29rdXAucHkKcGFj.mydomain.local
+a2V0X2NhcHR1cmUucHkKcmVxdWlyZW1l.mydomain.local
+RG9ja2VyZmlsZQpjYXB0dXJlLnNoCmNh.mydomain.local
+bnRzLnR4dAo=.mydomain.local
+cHR1cmVzCmRuc19sb29rdXAucHkKcGFj.mydomain.local
+a2V0X2NhcHR1cmUucHkKcmVxdWlyZW1l.mydomain.local
+```
+
+We can then remove the `.mydomain.local` as this is unnecessary to see the data we are transmitting. It is instead just something to not raise alarms for someone monitoring network traffic.
+
+```
+d29ya3N0YXRpb24tMQo=
+RG9ja2VyZmlsZQpjYXB0dXJlLnNoCmNh
+cHR1cmVzCmRuc19sb29rdXAucHkKcGFj
+a2V0X2NhcHR1cmUucHkKcmVxdWlyZW1l
+RG9ja2VyZmlsZQpjYXB0dXJlLnNoCmNh
+bnRzLnR4dAo=
+cHR1cmVzCmRuc19sb29rdXAucHkKcGFj
+a2V0X2NhcHR1cmUucHkKcmVxdWlyZW1l
+```
+
+Lets save these entries to a file named [`b64data.txt`](./tutorial/b64data.txt) (click to download for reference). From here, we can run the `base64` program with the `-d` flag to see the decoded information. I have saved these results to another file [`decoded_data.txt`](./tutorial/decoded_data.txt) (click to download for reference).
+
+```
+ccrollin@thinkpad-p43s:~/.../dev$ base64 -d dns-tunneling/tutorial/b64data.txt 
+workstation-1
+Dockerfile
+capture.sh
+captures
+dns_lookup.py
+packet_capture.py
+requiremeDockerfile
+capture.sh
+cants.txt
+ptures
+dns_lookup.py
+packet_capture.py
+requireme
+```
+
+And there we go! There is the results of running our `ls` command remotely on `workstation-1`. This aligns with the results we saw earlier in the simulation. Note that due to the way the packets were interleaved the lines might be out of order. The simulation takes care of reordering for us, so that is why you might notice the discrepancy.
+
 #### Packet Capture File
-A sample packet capture file can be downloaded at [`tutorial/dns-tunneling.pcapng`](/dns-tunneling/tutorial/dns-tunneling.pcapng).
+A sample packet capture file can be downloaded at [`tutorial/dns-tunneling.pcapng`](/dns-tunneling/tutorial/dns-tunneling.pcapng). To play around more if you want.
 
 ## Stopping the Simulation
 When you are done with the simulation, you can stop the containerlab, using the `make destroy` script file. **You will be asked to authenticate because containerlab requires sudo permissions**. Your terminal output should resemble to snippet below.
