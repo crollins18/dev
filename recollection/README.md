@@ -4,7 +4,20 @@ layout: page
 ---
 # HTB Sherlock - Recollection
 
+Challenge available for play at [app.hackthebox.com/sherlocks/Recollection](https://app.hackthebox.com/sherlocks/Recollection).
+
+#### Sherlock Scenario
+> A junior member of our security team has been performing research and testing on what we believe to be an old and insecure operating system. We believe it may have been compromised & have managed to retrieve a memory dump of the asset. We want to confirm what actions were carried out by the attacker and if any other assets in our environment might be affected. Please answer the questions below.
+
+
+You can download the `recollection.zip` file (which has the `recollection.bin` we will use through out this post) from the first link on HackTheBox above and follow along if you would like. The password for the file is `hacktheblue`.
+
+I am using the Volatility memory analysis tool for the majority of this challenge. You can find out how to setup Volatility [here](https://cpuu.hashnode.dev/an-introduction-to-volatility-3). For finding out which Volatility commands I needed to use for each question, I used the HackTricks cheatsheet available [here](https://book.hacktricks.xyz/generic-methodologies-and-resources/basic-forensic-methodology/memory-dump-analysis/volatility-cheatsheet) (it is super helpful!).
+
 ### Question 1 & 2
+Q1: What is the Operating System of the machine?
+
+Q2: When was the memory dump created?
 ```
 ccrollin@thinkpad-p43s:~/.../recollection$ file recollection.bin
 recollection.bin: data
@@ -31,6 +44,8 @@ The operating system of the machine is identified as Windows 7 Service Pack 1 x6
 ---
 
 ### Question 3
+Q3: After the attacker gained access to the machine, the attacker copied an obfuscated PowerShell command to the clipboard. What was the command?
+
 `volatility --profile=Win7SP1x64 clipboard -f recollection.bin`
 
 ```
@@ -47,6 +62,8 @@ The obfuscated PowerShell command copied to the clipboard is `(gv '*MDR*').naMe[
 ---
 
 ### Question 4
+Q4: The attacker copied the obfuscated command to use it as an alias for a PowerShell cmdlet. What is the cmdlet name?
+
 `volatility --profile=Win7SP1x64 consoles -f recollection.bin`
 
 ```
@@ -60,6 +77,10 @@ The obfuscated command `(gv '*MDR*').naMe[3,11,2]-joIN''` is used as an alias fo
 ---
 
 ### Question 5 & 6
+Q5: A CMD command was executed to attempt to exfiltrate a file. What is the full command line?
+
+Q6: Following the above command, now tell us if the file was exfiltrated successfully?
+
 `volatility --profile=Win7SP1x64 consoles -f recollection.bin`
 
 ```
@@ -77,6 +98,8 @@ The full command line attempted by the attacker to exfiltrate the file is `type 
 ---
 
 ### Question 7
+Q7: The attacker tried to create a readme file. What was the full path of the file?
+
 `volatility --profile=Win7SP1x64 consoles -f recollection.bin`
 ```
 PS C:\Users\user> powershell -e "ZWNobyAiaGFja2VkIGJ5IG1hZmlhIiA+ICJDOlxVc2Vyc1xQdWJsaWNcT2ZmaWNlXHJlYWRtZS50eHQi"
@@ -95,6 +118,10 @@ The attacker used a Base64-encoded PowerShell command to create a readme file wi
 ---
 
 ### Question 8 & 9
+Q8: What was the Host Name of the machine?
+
+Q9: How many user accounts were in the machine?
+
 `volatility --profile=Win7SP1x64 consoles -f recollection.bin`
 ```
 PS C:\Users\user> net users                                                                                             
@@ -115,6 +142,8 @@ The host name of the machine is `USER-PC`, and there are three user accounts: Ad
 ---
 
 ### Question 10
+Q10: In the `\Device\HarddiskVolume2\Users\user\AppData\Local\Microsoft\Edge` folder there were some sub-folders where there was a file named passwords.txt. What was the full file location/path?
+
 `volatility --profile=Win7SP1x64 filescan -f recollection.bin`
 ```
 ccrollin@thinkpad-p43s:~/.../recollection$ grep 'password' filescan.recollection.txt 
@@ -129,6 +158,12 @@ The full file location of `passwords.txt` is found within the Edge browser's use
 ---
 
 ### Question 11, 12, & 13
+Q11: A malicious executable file was executed using command. The executable EXE file's name was the hash value of itself. What was the hash value?
+
+Q12: Following the previous question, what is the Imphash of the malicous file you found above?
+
+Q13: Following the previous question, tell us the date in UTC format when the malicious file was created?
+
 `volatility --profile=Win7SP1x64 consoles -f recollection.bin`
 ```
 PS C:\Users\user\Downloads> ls                                                  
@@ -170,6 +205,8 @@ Now look at the **History** heading in VirusTotal for the **Creation Time** - `2
 ---
 
 ### Question 14
+Q14: What was the local IP address of the machine?
+
 `volatility --profile=Win7SP1x64 netscan -f recollection.bin`
 ```
 Offset(P)          Proto    Local Address                  Foreign Address      State            Pid      Owner          Created
@@ -254,6 +291,8 @@ The local IP address of the machine is `192.168.0.104`
 ---
 
 ### Question 15
+Q15: There were multiple PowerShell processes, where one process was a child process. Which process was its parent process?
+
 `volatility --profile=Win7SP1x64 pstree -f recollection.bin`
 ```
 Name                                                  Pid   PPid   Thds   Hnds Time
@@ -266,6 +305,8 @@ Parent process is `cmd.exe`.
 ---
 
 ### Question 16
+Q16: Attacker might have used an email address to login a social media. Can you tell us the email address?
+
 `grep -E -o "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}\b" edge_dump/strings.2380.dmp`
 ```
 gmail.commafia_code1337@gmail.comc
@@ -483,6 +524,8 @@ Email used in Edge is `mafia_code1337@gmail.com`.
 ---
 
 ### Question 17
+Q17: Using MS Edge browser, the victim searched about a SIEM solution. What is the SIEM solution's name?
+
 `volatility -f recollection.bin --profile=Win7SP1x64 memdump -p 2380 -D edge-dump/`
 
 We now have `edge_dump/2380.dmp` as a process dump file.
@@ -517,6 +560,8 @@ Looking at the top 10 visited domains, we see the following.
 ---
 
 ### Question 18
+Q18: The victim user downloaded an exe file. The file's name was mimicking a legitimate binary from Microsoft with a typo (i.e. legitimate binary is powershell.exe and attacker named a malware as powershall.exe). Tell us the file name with the file extension?
+
 `volatility --profile=Win7SP1x64 filescan -f recollection.bin`
 `grep "\\Downloads.*\.exe" filescan.recollection.txt`
 ```
