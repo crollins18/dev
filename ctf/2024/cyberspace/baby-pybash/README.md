@@ -1,3 +1,8 @@
+---
+permalink: /ctf/2024/cyberspace/baby-pybash
+layout: page
+---
+
 # baby-pybash
 
 This write-up is also publically available on CTFTime [here](https://ctftime.org/task/28913).
