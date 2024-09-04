@@ -223,3 +223,5 @@ python3(472460)───bash(472515)───bash(472516)
 
 ccrollin@thinkpad-p43s ~/D/c/2/cyberspace> 
 ```
+
+The challenge source files can be found in full [here](https://google.com).
