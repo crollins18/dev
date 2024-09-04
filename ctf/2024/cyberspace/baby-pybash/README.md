@@ -192,7 +192,7 @@ output = execute_command(cmd) # calls subprocess.run(), see earlier snippet of e
 print(output)
 ```
 
-See the `strace` output for when the exploit is run to provide further clarificiation.
+See the `strace` output for when the exploit is run to provide further clarification.
 
 ```
 463843 execve("/usr/bin/python3", ["python3", "-u", "chall.py"], 0x7fff85204440 /* 53 vars */) = 0 <====== RUNNNG Python parent process
@@ -212,7 +212,7 @@ See the `strace` output for when the exploit is run to provide further clarifici
 ****** NOTICE bash NEVER calls exit() *******
 ```
 
-The `ps` tool (a terminal version of say Windows Task Manager) and `pstree` can give us a nice visually process tree too.
+The `ps` tool (a terminal version of say Windows Task Manager) and `pstree` can give us a nice visual process tree too.
 
 ```
 ccrollin@thinkpad-p43s ~/D/c/2/cyberspace> ps -a
