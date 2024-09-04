@@ -7,6 +7,8 @@ layout: page
 
 This write-up is also publically available on CTFTime [here](https://ctftime.org/task/28913).
 
+The challenge source files can be found in full [here](https://github.com/crollins18/dev/tree/main/ctf/2024/cyberspace/baby-pybash/challenge). _I highly suggest reading over these files first to get an idea of the environment before proceeding._
+
 ### Summary
 > This challenge is a jail style challenge in which we are given a remote shell that screens input from the user. If it is an allowed command it is executed. We will seek a solution in which we can bypass the restrictions to print out a `flag.txt` file on the server, for which we would have no other way to access except through an exploit. Finding the contents of the flag shows that you have gained unauthorized access to the internals of the server.
 
@@ -228,5 +230,3 @@ python3(472460)───bash(472515)───bash(472516)
 
 ccrollin@thinkpad-p43s ~/D/c/2/cyberspace> 
 ```
-
-The challenge source files can be found in full [here](https://github.com/crollins18/dev/tree/main/ctf/2024/cyberspace/baby-pybash/challenge).
