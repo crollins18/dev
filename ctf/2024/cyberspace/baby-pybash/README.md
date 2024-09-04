@@ -62,7 +62,7 @@ def execute_command(command):
 ### Refresher on Process Management
 The basics of OS process management can lead us to guess this function will under the hood duplicate itself via `fork()` and in the new process `exeve()` the command we want. This is how all shells inclulding bash work under the hood. Let's write a simple python program with just the `subprocess.run()` call on a command say....`ls` to illustrate this.
 
-```python, execsyscall.py
+```python
 import subprocess
 
 subprocess.run("ls", stdout=True, shell=True)
@@ -118,7 +118,7 @@ The `argv` is what want to look closer at. Most programming languages including 
 
 With special variables of course! This is where experiance scripting comes in handy. When I looked at the different allowed characters from earlier I knew that `$0`, `$1`, `$2`, etc. would be allowed. Let's see what `$0` is by calling `echo $0`.
 
-```python, checkdollarzero.py
+```python
 import subprocess
 
 subprocess.run("echo $0", stdout=True, shell=True)
@@ -229,4 +229,4 @@ python3(472460)───bash(472515)───bash(472516)
 ccrollin@thinkpad-p43s ~/D/c/2/cyberspace> 
 ```
 
-The challenge source files can be found in full [here](https://google.com).
+The challenge source files can be found in full [here](https://github.com/crollins18/dev/tree/main/ctf/2024/cyberspace/baby-pybash/challenge).
