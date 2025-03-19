@@ -1,0 +1,356 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+    <h2 class="mb-3">Network Element (NE) Data</h2>
+
+    <p>Please allow time for page to load at first.</p>
+
+    <table class="table table-hover table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>NEID</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="data-body">
+            <!-- Data will be populated here -->
+        </tbody>
+    </table>
+
+    <!-- Inspect Modal -->
+    <div class="modal fade" id="inspectModal" tabindex="-1" aria-labelledby="inspectModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="inspectModalLabel">Inspect Network Element Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Show Loading initially -->
+                    <div id="loading-indicator-inspect" class="text-center">
+                        <span>Loading</span><span class="dots">...</span>
+                    </div>
+                    <!-- Inspect Data will go here after loading -->
+                    <div id="inspect-content" style="display: none;">
+                        <!-- Dynamically filled content will go here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Routing Table Modal -->
+    <div class="modal fade" id="routingModal" tabindex="-1" aria-labelledby="routingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="routingModalLabel">Routing Table</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Show Loading initially -->
+                    <div id="loading-indicator-routing" class="text-center">
+                        <span>Loading</span><span class="dots">...</span>
+                    </div>
+                    <!-- Routing Table will go here after loading -->
+                    <div id="routing-table-content" style="display: none;">
+                        <!-- Dynamically filled content will go here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- IP Neighbor Modal -->
+    <div class="modal fade" id="neighborModal" tabindex="-1" aria-labelledby="neighborModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="neighborModalLabel">Neighbors (IP)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Show Loading initially -->
+                    <div id="loading-indicator-neighbor" class="text-center">
+                        <span>Loading</span><span class="dots">...</span>
+                    </div>
+                    <!-- IP Neighbors will go here after loading -->
+                    <div id="ip-neighbors-content" style="display: none;">
+                        <!-- Dynamically filled content will go here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="successModalLabel">Success</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Ticket successfully created. See Ticket tab!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const evtSource = new EventSource('/api/v1/getMetric/ALL/ifadminstatus,ifoperstatus');
+        let openAgents = new Set();
+
+        evtSource.onmessage = function(event) {
+            const newMetrics = JSON.parse(event.data);
+            
+            $("#data-body").empty();
+            
+            let groupedMetrics = {};
+            newMetrics.forEach(metric => {
+                if (!groupedMetrics[metric.agent]) {
+                    groupedMetrics[metric.agent] = [];
+                }
+                groupedMetrics[metric.agent].push(metric);
+            });
+
+            let tableRows = "";
+            
+            Object.keys(groupedMetrics).forEach(agent => {
+                let agentId = agent.replace(/\./g, "-"); 
+                let isOpen = openAgents.has(agentId);
+                
+                tableRows += `
+                    <tr class="agent-row" data-agent="${agentId}">
+                        <td><strong>${agent}</strong></td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" onclick="toggleRows(event, '${agentId}')">
+                                <span id="icon-${agentId}" class="bi ${isOpen ? 'bi-dash-circle' : 'bi-plus-circle'}"></span>
+                            </button>
+                            <button class="btn btn-info btn-sm" onclick="inspectData(event, '${agent}')">
+                                <span class="bi bi-info-circle"></span>
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="routingData(event, '${agent}')">
+                                <span class="bi bi-table"></span>
+                            </button>
+                            <button class="btn btn-warning btn-sm" onclick="neighborData(event, '${agent}')">
+                                <span class="bi bi-people"></span>
+                            </button>
+                            <button class="btn btn-success btn-sm" onclick="sendTicketData(event, '${agent}')">
+                                <span class="bi bi-upload"></span> Create Ticket
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                
+                groupedMetrics[agent].forEach(metric => {
+                    tableRows += `
+                        <tr class="agent-${agentId} data-row" style="display: ${isOpen ? 'table-row' : 'none'};">
+                            <td colspan="2">
+                                <div class="p-2 border rounded bg-light">
+                                    <strong>ifindex:</strong> ${metric.dataSource}<br>
+                                    <strong>${metric.metricName}:</strong> ${metric.metricValue}<br>
+                                    <strong>Last Update:</strong> ${metric.lastUpdate} ms
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+            });
+            
+            $("#data-body").html(tableRows);
+        };
+
+        function toggleRows(event, agentId) {
+            event.stopPropagation();
+            if (openAgents.has(agentId)) {
+                openAgents.delete(agentId);
+                $(`.agent-${agentId}`).hide();
+                $(`#icon-${agentId}`).removeClass("bi-dash-circle").addClass("bi-plus-circle");
+            } else {
+                openAgents.add(agentId);
+                $(`.agent-${agentId}`).show();
+                $(`#icon-${agentId}`).removeClass("bi-plus-circle").addClass("bi-dash-circle");
+            }
+        }
+
+        async function inspectData(event, agentId) {
+            event.stopPropagation();
+
+            document.getElementById('loading-indicator-inspect').style.display = 'block';
+            document.getElementById('inspect-content').style.display = 'none';
+
+            const modal = new bootstrap.Modal(document.getElementById('inspectModal'));
+            modal.show();
+
+            try {
+                const response = await fetch(`/api/v1/getMetric/${agentId}/inspect/facts`);
+                
+                if (!response.ok) {
+                    throw new Error("Failed to fetch data");
+                }
+                
+                const agentData = await response.json();
+                
+                document.getElementById('loading-indicator-inspect').style.display = 'none';
+                document.getElementById('inspect-content').style.display = 'block';
+
+                const formattedData = formatFactsJsonData(agentData);
+                document.getElementById('inspect-content').innerHTML = formattedData;
+            }
+            catch (error) {
+                console.error("Error fetching inspect data:", error);
+                alert("An error occurred while fetching the data.");
+            }
+        }
+
+        async function routingData(event, agentId) {
+            event.stopPropagation();
+
+            document.getElementById('loading-indicator-routing').style.display = 'block';
+            document.getElementById('routing-table-content').style.display = 'none';
+
+            const modal = new bootstrap.Modal(document.getElementById('routingModal'));
+            modal.show();
+
+            try {
+                const response = await fetch(`/api/v1/getMetric/${agentId}/inspect/routing`);
+                
+                if (!response.ok) {
+                    throw new Error("Failed to fetch data");
+                }
+
+                const data = await response.text();
+
+                document.getElementById('loading-indicator-routing').style.display = 'none';
+                document.getElementById('routing-table-content').style.display = 'block';
+
+                document.getElementById('routing-table-content').innerHTML = "<pre>" + data + "</pre>";
+            }
+            catch (error) {
+                console.error("Error fetching data:", error);
+                alert("An error occurred while fetching the data.");
+            }
+        }
+
+        async function neighborData(event, agentId) {
+            event.stopPropagation();
+
+            document.getElementById('loading-indicator-neighbor').style.display = 'block';
+            document.getElementById('ip-neighbors-content').style.display = 'none';
+
+            const modal = new bootstrap.Modal(document.getElementById('neighborModal'));
+            modal.show();
+
+            try {
+                const response = await fetch(`/api/v1/getMetric/${agentId}/inspect/neighbors`);
+                
+                if (!response.ok) {
+                    throw new Error("Failed to fetch data");
+                }
+
+                const data = await response.text();
+
+                document.getElementById('loading-indicator-neighbor').style.display = 'none';
+                document.getElementById('ip-neighbors-content').style.display = 'block';
+
+                document.getElementById('ip-neighbors-content').innerHTML = "<pre>" + data + "</pre>";
+            }
+            catch (error) {
+                console.error("Error fetching data:", error);
+                alert("An error occurred while fetching the data.");
+            }
+        }
+
+        async function sendTicketData(event, agentId) {
+            event.stopPropagation();
+
+            try {
+                const response = await fetch(`/api/v1/tickets`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ neid: agentId })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to send data");
+                }
+
+                const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                successModal.show();
+            } catch (error) {
+                console.error("Error sending data:", error);
+                alert("An error occurred while sending data.");
+            }
+        }
+
+        function formatFactsJsonData(data) {
+            if (!data || typeof data !== 'object') {
+                return "<div class='alert alert-danger'>Invalid or empty data.</div>";
+            }
+
+            let htmlContent = "";
+            
+            if (data.ansible_net_hostname) {
+                htmlContent += `
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <strong>Hostname</strong>
+                        </div>
+                        <div class="card-body">
+                            ${data.ansible_net_hostname}
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (data.ansible_net_config) {
+                htmlContent += `
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <strong>Configuration</strong>
+                        </div>
+                        <div class="card-body">
+                            <pre>${data.ansible_net_config}</pre>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (data.ansible_net_version) {
+                htmlContent += `
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <strong>System Version</strong>
+                        </div>
+                        <div class="card-body">
+                            ${data.ansible_net_version}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (data.ansible_net_system) {
+                htmlContent += `
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <strong>System</strong>
+                        </div>
+                        <div class="card-body">
+                            ${data.ansible_net_system}
+                        </div>
+                    </div>
+                `;
+            }
+
+            return htmlContent;
+        }
+
+        evtSource.onerror = function (error) {
+            console.error("Error receiving updates", error);
+        };
+    </script>
+{% endblock %}
