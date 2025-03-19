@@ -1,0 +1,4 @@
+*.bak
+clab-virtualized-network/*
+.venv/*
+__pycache__/*
