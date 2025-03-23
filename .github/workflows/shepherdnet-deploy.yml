@@ -16,4 +16,4 @@ jobs:
       run: make build
     - name: run containerlab environment and run web app
       working-directory: ./shepherdnet
-      run: echo ${{ secrets.RUNNERPASS }} | sudo -S make run
+      run: make run
