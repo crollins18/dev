@@ -2,18 +2,20 @@ name: shepherdnet deploy on digital ocean droplet
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "shepherdnet" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "shepherdnet" ]
 
 jobs:
   deploy:
     runs-on: self-hosted
     steps:
     - uses: actions/checkout@v4
+    
     - name: build containerlab environment and build web app
       working-directory: ./shepherdnet
       run: make build
+
     - name: run containerlab environment and run web app
       working-directory: ./shepherdnet
       run: make run
