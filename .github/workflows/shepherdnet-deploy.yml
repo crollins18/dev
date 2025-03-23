@@ -11,11 +11,12 @@ jobs:
     runs-on: self-hosted
     steps:
     - uses: actions/checkout@v4
-    
     - name: build containerlab environment and build web app
+      working-directory: ./shepherdnet
       run: make build
   run:
     runs-on: self-hosted
     steps:
     - name: run containerlab environment and run web app
+      working-directory: ./shepherdnet
       run: make run
