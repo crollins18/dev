@@ -10,7 +10,7 @@ from core.inspection import neighbors
 
 metrics_bp = Blueprint('metrics', __name__, url_prefix='/api/v1/getMetric')
 
-restflow_base = "http://clab-virtualized-network-sflow-rt:8008"
+restflow_base = "http://clab-fdc-sflow-rt:8008"
 
 def call_restflow(uri_path):
     while True:

@@ -1,12 +1,13 @@
 .PHONY: build run destroy
 
 build:
-	docker build -t frr-modded --no-cache infrastructure-config/frr-modded
-	docker-compose build --no-cache
+	docker build -t clab-sflow-rt infrastructure-config/clab-sflow-rt
+	docker build -t clab-frr infrastructure-config/clab-frr
+	docker compose build
 run:
-	sudo containerlab deploy --topo infrastructure-config/infra.clab.yml --reconfigure
-	sudo containerlab graph --topo infrastructure-config/infra.clab.yml --mermaid
-	docker-compose up -d
+	sudo containerlab deploy --topo infrastructure-config/bgp-frr.clab.yml
+	sudo containerlab graph --topo infrastructure-config/bgp-frr.clab.yml --mermaid
+	docker compose up -d
 destroy:
-	sudo containerlab destroy --topo infrastructure-config/infra.clab.yml --cleanup
-	docker-compose down
+	sudo containerlab destroy --topo infrastructure-config/bgp-frr.clab.yml --cleanup
+	docker compose down

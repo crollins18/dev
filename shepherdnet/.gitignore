@@ -1,4 +1,1 @@
-*.bak
-clab-virtualized-network/*
-.venv/*
-__pycache__/*
+clab-fdc

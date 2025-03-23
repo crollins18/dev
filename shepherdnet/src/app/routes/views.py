@@ -6,7 +6,7 @@ app_data = {
     "title": "ShepherdNet",
     "description": "A web UI to monitor network status for troubles",
     "author": "Caleb Rollins",
-    "topo_filepath": "infra.clab.mermaid",
+    "topo_filepath": "bgp-frr.clab.mermaid",
 }
 
 @views_bp.route("/")

@@ -2,10 +2,10 @@ version: '3'
 
 services:
   flask:
-    build: ./src
+    build: src
     container_name: flask_app
     networks:
-      - admin
+      - clab
     ports:
       - "5000:5000"
     depends_on:
@@ -15,14 +15,14 @@ services:
     image: mongo:latest
     container_name: mongodb
     networks:
-      - admin
+      - clab
     ports:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
 
 networks:
-  admin:
+  clab:
     external: true
 
 volumes:
