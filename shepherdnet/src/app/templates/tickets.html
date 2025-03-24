@@ -9,6 +9,7 @@
                 <tr>
                     <th>#</th>
                     <th>NEID</th>
+                    <td>Trouble Report Narrative</td>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -20,7 +21,7 @@
             $.getJSON("/api/v1/tickets", function(data) {
                 let tableBody = "";
                 data.forEach((ticket, index) => {
-                    tableBody += `<tr><td>${index + 1}</td><td>${ticket.neid}</td></tr>`;
+                    tableBody += `<tr><td>${index + 1}</td><td>${ticket.neid}</td><td>${ticket.ticketNarrative}</td></tr>`;
                 });
 
                 $("#ticketTable tbody").html(tableBody);

@@ -58,6 +58,6 @@ def get_agent_routes(agent):
     return result
 
 @metrics_bp.route('/<string:agent>/inspect/neighbors', methods=['GET'])
-def get_agent_ip_neighbors(agent):
-    result = neighbors.get_ip_neighbor_info(device_type="linux", host=agent, username="frruser", password="frrpassword")
+def get_agent_bgp_neighbors(agent):
+    result = neighbors.get_bgp_neighbor_info(device_type="linux", host=agent, username="frruser", password="frrpassword")
     return result

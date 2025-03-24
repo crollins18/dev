@@ -61,12 +61,12 @@
         </div>
     </div>
 
-    <!-- IP Neighbor Modal -->
+    <!-- BGP Neighbor Modal -->
     <div class="modal fade" id="neighborModal" tabindex="-1" aria-labelledby="neighborModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="neighborModalLabel">Neighbors (IP)</h5>
+                    <h5 class="modal-title" id="neighborModalLabel">Neighbors (BGP)</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -74,8 +74,8 @@
                     <div id="loading-indicator-neighbor" class="text-center">
                         <span>Loading</span><span class="dots">...</span>
                     </div>
-                    <!-- IP Neighbors will go here after loading -->
-                    <div id="ip-neighbors-content" style="display: none;">
+                    <!-- BGP Neighbors will go here after loading -->
+                    <div id="bgp-neighbors-content" style="display: none;">
                         <!-- Dynamically filled content will go here -->
                     </div>
                 </div>
@@ -93,6 +93,31 @@
                 </div>
                 <div class="modal-body">
                     Ticket successfully created. See Ticket tab!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ticket Creation Modal (New) -->
+    <div class="modal fade" id="ticketModal" tabindex="-1" aria-labelledby="ticketModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ticketModalLabel">Create Ticket</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="ticketForm">
+                        <div class="mb-3">
+                            <label for="ticketNarrative" class="form-label">Ticket Narrative</label>
+                            <textarea class="form-control" id="ticketNarrative" rows="4" placeholder="Enter narrative here..."></textarea>
+                        </div>
+                        <input type="hidden" id="ticketNeid">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" onclick="submitTicket()">Submit Ticket</button>
                 </div>
             </div>
         </div>
@@ -137,7 +162,7 @@
                             <button class="btn btn-warning btn-sm" onclick="neighborData(event, '${agent}')">
                                 <span class="bi bi-people"></span>
                             </button>
-                            <button class="btn btn-success btn-sm" onclick="sendTicketData(event, '${agent}')">
+                            <button class="btn btn-success btn-sm" onclick="openTicketModal(event, '${agent}')">
                                 <span class="bi bi-upload"></span> Create Ticket
                             </button>
                         </td>
@@ -238,7 +263,7 @@
             event.stopPropagation();
 
             document.getElementById('loading-indicator-neighbor').style.display = 'block';
-            document.getElementById('ip-neighbors-content').style.display = 'none';
+            document.getElementById('bgp-neighbors-content').style.display = 'none';
 
             const modal = new bootstrap.Modal(document.getElementById('neighborModal'));
             modal.show();
@@ -253,9 +278,9 @@
                 const data = await response.text();
 
                 document.getElementById('loading-indicator-neighbor').style.display = 'none';
-                document.getElementById('ip-neighbors-content').style.display = 'block';
+                document.getElementById('bgp-neighbors-content').style.display = 'block';
 
-                document.getElementById('ip-neighbors-content').innerHTML = "<pre>" + data + "</pre>";
+                document.getElementById('bgp-neighbors-content').innerHTML = "<pre>" + data + "</pre>";
             }
             catch (error) {
                 console.error("Error fetching data:", error);
@@ -263,8 +288,24 @@
             }
         }
 
-        async function sendTicketData(event, agentId) {
+        // New function to open the Ticket Modal and set the NEID
+        function openTicketModal(event, agentId) {
             event.stopPropagation();
+            document.getElementById('ticketNeid').value = agentId;
+            document.getElementById('ticketNarrative').value = "";
+            const modal = new bootstrap.Modal(document.getElementById('ticketModal'));
+            modal.show();
+        }
+
+        // New function to submit the ticket with the narrative
+        async function submitTicket() {
+            const agentId = document.getElementById('ticketNeid').value;
+            const narrative = document.getElementById('ticketNarrative').value.trim();
+
+            if (!narrative) {
+                alert("Please enter a ticket narrative.");
+                return;
+            }
 
             try {
                 const response = await fetch(`/api/v1/tickets`, {
@@ -272,18 +313,19 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ neid: agentId })
+                    body: JSON.stringify({ neid: agentId, ticketNarrative: narrative })
                 });
 
                 if (!response.ok) {
-                    throw new Error("Failed to send data");
+                    throw new Error("Failed to send ticket data");
                 }
 
                 const successModal = new bootstrap.Modal(document.getElementById('successModal'));
                 successModal.show();
+                bootstrap.Modal.getInstance(document.getElementById('ticketModal')).hide();
             } catch (error) {
-                console.error("Error sending data:", error);
-                alert("An error occurred while sending data.");
+                console.error("Error submitting ticket:", error);
+                alert("An error occurred while submitting the ticket.");
             }
         }
 
