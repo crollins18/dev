@@ -5,7 +5,7 @@ build:
 	docker build -t clab-frr infrastructure-config/clab-frr
 	docker compose build
 run:
-	containerlab deploy --topo infrastructure-config/bgp-frr.clab.yml
+	containerlab deploy --topo infrastructure-config/bgp-frr.clab.yml --reconfigure
 	containerlab graph --topo infrastructure-config/bgp-frr.clab.yml --mermaid
 	docker compose up -d
 destroy:
