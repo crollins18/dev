@@ -48,7 +48,7 @@ The live map is rendered using a Mermaid diagram, which visually represents the 
 - **Flask:** The dashboard is deployed using a Flask application, which provides a lightweight backend for serving API requests and rendering dynamic content. Flask integrates seamlessly with our Python scripts, making it an ideal choice for deploying the shepherdnet dashboard.
 
 ## Demo Site
-A demo site is hosted on a Digital Ocean VM I spun up. Check it out [here](http://104.248.227.42:5000/dashboard).
+A demo site is hosted on a Digital Ocean VM I spun up. Check it out [here](http://shepherdnet.crollins.io:5000/dashboard).
 
 ## Documentation
 Keep an eye out for more formal documentation in the `docs` directory as the project matures.
