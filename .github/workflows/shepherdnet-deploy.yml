@@ -25,4 +25,4 @@ jobs:
     steps:
     - name: ping across
       working-directory: ./shepherdnet
-      run: ./router_connect_test.sh && ./host_connect_test.sh
+      run: ./infrastructure-config/router_connect_test.sh && ./infrastructure-config/host_connect_test.sh
