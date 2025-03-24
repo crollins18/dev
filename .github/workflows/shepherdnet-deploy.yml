@@ -19,3 +19,9 @@ jobs:
     - name: run containerlab environment and run web app
       working-directory: ./shepherdnet
       run: make run
+  check-health:
+    runs-on: self-hosted
+    steps:
+    - name: ping across
+      working-directory: ./shepherdnet
+      run: ./router_connect_test.sh && ./host_connect_test.sh
