@@ -20,7 +20,7 @@
     </div>
     
     <script>
-        const evtSource = new EventSource('/api/v1/getMetric/ALL/health');
+        const evtSource = new EventSource('/api/v1/metrics/ALL/health');
         
         evtSource.onmessage = function(event) {
             const nodes = JSON.parse(event.data);
@@ -29,7 +29,7 @@
                 const nodeElement = document.querySelector(`#mermaid-diagram .node[data-id="${dict.agent}"]`);
                 if (nodeElement) {
                     rectangle = nodeElement.querySelector(`rect`);
-                    color = (dict.metricValue == "up") ? "green" : "red";
+                    color = (dict.metricValue == "up") ? "#B1F9A4" : "#FFCCCB";
                     rectangle.style.setProperty('fill', color, 'important');
                 }
             });

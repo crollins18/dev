@@ -6,4 +6,4 @@
     - name: Collect all information from the device
       frr.frr.frr_facts:
         gather_subset:
-        - all
+          - all

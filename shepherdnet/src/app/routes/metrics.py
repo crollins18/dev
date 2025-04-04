@@ -8,7 +8,7 @@ from os import getcwd
 from core.inspection import routing
 from core.inspection import neighbors
 
-metrics_bp = Blueprint('metrics', __name__, url_prefix='/api/v1/getMetric')
+metrics_bp = Blueprint('metrics', __name__, url_prefix='/api/v1/metrics')
 
 restflow_base = "http://clab-fdc-sflow-rt:8008"
 
@@ -28,9 +28,15 @@ def get_agent_metric(agent, metric):
 
 @metrics_bp.route('/<string:agent>/health', methods=['GET'])
 def get_agent_health(agent):
-    metric = "ifadminstatus"
+    metric = "ifoperstatus"
     endpoint = f"/dump/{agent}/{metric}/json"
     return Response(call_restflow(restflow_base + endpoint), content_type='text/event-stream')
+
+@metrics_bp.route('/<string:agent>/status', methods=['GET'])
+def get_agent_status(agent):
+    endpoint = f"/agents/json?agent={agent}"
+    response = get(restflow_base + endpoint)
+    return response.json()
 
 @metrics_bp.route('/<string:agent>/inspect/facts', methods=['GET'])
 def get_agent_facts(agent):

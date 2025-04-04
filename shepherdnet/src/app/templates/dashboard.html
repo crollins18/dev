@@ -83,6 +83,28 @@
         </div>
     </div>
 
+    <!-- sFlow Agent Details Modal -->
+    <div class="modal fade" id="sflowAgentInfoModal" tabindex="-1" aria-labelledby="sflowAgentInfoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="sflowAgentInfoModalLabel">sFlow Agent Details (Static Snapshot)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Show Loading initially -->
+                    <div id="loading-indicator-sflow" class="text-center">
+                        <span>Loading</span><span class="dots">...</span>
+                    </div>
+                    <!-- sFlow Details will go here after loading -->
+                    <div id="sflow-agent-content" style="display: none;">
+                        <!-- Dynamically filled content will go here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Success Modal -->
     <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -124,7 +146,7 @@
     </div>
 
     <script>
-        const evtSource = new EventSource('/api/v1/getMetric/ALL/ifadminstatus,ifoperstatus');
+        const evtSource = new EventSource('/api/v1/metrics/ALL/ifadminstatus,ifoperstatus');
         let openAgents = new Set();
 
         evtSource.onmessage = function(event) {
@@ -161,6 +183,9 @@
                             </button>
                             <button class="btn btn-warning btn-sm" onclick="neighborData(event, '${agent}')">
                                 <span class="bi bi-people"></span>
+                            </button>
+                            <button class="btn btn-dark btn-sm" onclick="sflowAgentInfo(event, '${agent}')">
+                                <span class="bi bi-activity"></span>
                             </button>
                             <button class="btn btn-success btn-sm" onclick="openTicketModal(event, '${agent}')">
                                 <span class="bi bi-upload"></span> Create Ticket
@@ -200,6 +225,21 @@
             }
         }
 
+        // Helper function to pretty-print JSON responses using Bootstrap styling.
+        function prettyPrintJSON(data) {
+            let formatted;
+            try {
+                // Try to parse as JSON (if data is a JSON string)
+                let jsonObj = typeof data === 'string' ? JSON.parse(data) : data;
+                formatted = JSON.stringify(jsonObj, null, 2);
+            } catch (e) {
+                // If not JSON, show the original data
+                formatted = data;
+            }
+            // Return a formatted pre block with Bootstrap classes
+            return `<pre class="bg-light p-3 rounded border" style="max-height:400px; overflow:auto;">${formatted}</pre>`;
+        }
+
         async function inspectData(event, agentId) {
             event.stopPropagation();
 
@@ -210,7 +250,7 @@
             modal.show();
 
             try {
-                const response = await fetch(`/api/v1/getMetric/${agentId}/inspect/facts`);
+                const response = await fetch(`/api/v1/metrics/${agentId}/inspect/facts`);
                 
                 if (!response.ok) {
                     throw new Error("Failed to fetch data");
@@ -240,7 +280,7 @@
             modal.show();
 
             try {
-                const response = await fetch(`/api/v1/getMetric/${agentId}/inspect/routing`);
+                const response = await fetch(`/api/v1/metrics/${agentId}/inspect/routing`);
                 
                 if (!response.ok) {
                     throw new Error("Failed to fetch data");
@@ -269,7 +309,7 @@
             modal.show();
 
             try {
-                const response = await fetch(`/api/v1/getMetric/${agentId}/inspect/neighbors`);
+                const response = await fetch(`/api/v1/metrics/${agentId}/inspect/neighbors`);
                 
                 if (!response.ok) {
                     throw new Error("Failed to fetch data");
@@ -285,6 +325,35 @@
             catch (error) {
                 console.error("Error fetching data:", error);
                 alert("An error occurred while fetching the data.");
+            }
+        }
+
+        async function sflowAgentInfo(event, agentId) {
+            event.stopPropagation();
+
+            document.getElementById('loading-indicator-sflow').style.display = 'block';
+            document.getElementById('sflow-agent-content').style.display = 'none';
+
+            const modal = new bootstrap.Modal(document.getElementById('sflowAgentInfoModal'));
+            modal.show();
+
+            try {
+                const response = await fetch(`/api/v1/metrics/${agentId}/status`);
+                
+                if (!response.ok) {
+                    throw new Error("Failed to fetch sFlow agent information");
+                }
+                
+                const data = await response.text();
+
+                document.getElementById('loading-indicator-sflow').style.display = 'none';
+                document.getElementById('sflow-agent-content').style.display = 'block';
+
+                document.getElementById('sflow-agent-content').innerHTML = prettyPrintJSON(data);
+            }
+            catch (error) {
+                console.error("Error fetching sFlow information:", error);
+                alert("An error occurred while fetching sFlow information.");
             }
         }
 

@@ -1,39 +1,35 @@
-graph TD
-  %% Layer 1 - Hosts at the top
-  subgraph Hosts
-    host11[Host 11]
-    host12[Host 12]
-    host21[Host 21]
-    host22[Host 22]
-    host31[Host 31]
-    host32[Host 32]
+flowchart TD
+  subgraph Hosts["Hosts"]
+    host11["Host 11"]
+    host12["Host 12"]
+    host21["Host 21"]
+    host22["Host 22"]
+    host31["Host 31"]
+    host32["Host 32"]
+  end
+  subgraph Leafs["Leafs"]
+    172.20.20.21["Leaf 21"]
+    172.20.20.22["Leaf 22"]
+    172.20.20.23["Leaf 23"]
+  end
+  subgraph Spine["Spine"]
+    172.20.20.11["Spine 11"]
+    172.20.20.12["Spine 12"]
   end
 
-  %% Layer 2 - Intermediate Leafs in the middle
-  subgraph Leafs
-    172.20.20.21[172.20.20.21]
-    172.20.20.22[172.20.20.22]
-    172.20.20.23[172.20.20.23]
-  end
+  host11 -- eth1 to eth3 --> 172.20.20.21
+  host12 -- eth1 to eth4 --> 172.20.20.21
+  host21 -- eth1 to eth3 --> 172.20.20.22
+  host22 -- eth1 to eth4 --> 172.20.20.22
+  host31 -- eth1 to eth3 --> 172.20.20.23
+  host32 -- eth1 to eth4 --> 172.20.20.23
+  172.20.20.21 -- eth1 to eth1 --> 172.20.20.11
+  172.20.20.21 -- eth2 to eth1 --> 172.20.20.12
+  172.20.20.22 -- eth1 to eth2 --> 172.20.20.11
+  172.20.20.22 -- eth2 to eth2 --> 172.20.20.12
+  172.20.20.23 -- eth1 to eth3 --> 172.20.20.11
+  172.20.20.23 -- eth2 to eth3 --> 172.20.20.12
 
-  %% Layer 3 - Top Spines at the bottom
-  subgraph Spine
-    172.20.20.11[172.20.20.11]
-    172.20.20.12[172.20.20.12]
-  end
-
-  %% Connections from Layer 1 to Layer 2
-  host11 --> 172.20.20.21
-  host12 --> 172.20.20.21
-  host21 --> 172.20.20.22
-  host22 --> 172.20.20.22
-  host31 --> 172.20.20.23
-  host32 --> 172.20.20.23
-
-  %% Connections from Layer 2 to Layer 3
-  172.20.20.21 --> 172.20.20.11
-  172.20.20.21 --> 172.20.20.12
-  172.20.20.22 --> 172.20.20.11
-  172.20.20.22 --> 172.20.20.12
-  172.20.20.23 --> 172.20.20.11
-  172.20.20.23 --> 172.20.20.12
+  style Hosts fill:#FFFFFF,stroke:#000000,stroke-width:2px
+  style Leafs fill:#FFD580,stroke:##FFB92B,stroke-width:2px
+  style Spine fill:#BBDEFB,stroke:#8AB6F2,stroke-width:2px
