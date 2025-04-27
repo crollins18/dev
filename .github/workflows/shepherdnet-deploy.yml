@@ -2,9 +2,9 @@ name: shepherdnet deploy on digital ocean droplet
 
 on:
   push:
-    branches: [ "shepherdnet" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "shepherdnet" ]
+    branches: [ "main" ]
 
 jobs:
   deploy:
@@ -23,6 +23,6 @@ jobs:
     runs-on: self-hosted
     needs: deploy
     steps:
-    - name: ping across
+    - name: run tests
       working-directory: ./shepherdnet
-      run: ./infrastructure-config/router_connect_test.sh && ./infrastructure-config/host_connect_test.sh
+      run: make test
