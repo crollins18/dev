@@ -1,0 +1,20 @@
+services:
+  flask:
+    build: src
+    container_name: flask_app
+    networks:
+      - clab
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    networks:
+      - clab
+    ports:
+      - "27017:27017"
+networks:
+  clab:
+    external: true

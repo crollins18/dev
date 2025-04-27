@@ -1,0 +1,467 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+    <h2 class="mb-3">Network Element (NE) Data</h2>
+
+    <p>Please allow time for page to load at first.</p>
+
+    <table class="table table-hover table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>NEID</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="data-body">
+            <!-- Data will be populated here -->
+        </tbody>
+    </table>
+
+    <!-- Inspect Modal -->
+    <div class="modal fade" id="inspectModal" tabindex="-1" aria-labelledby="inspectModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="inspectModalLabel">Inspect Network Element Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Show Loading initially -->
+                    <div id="loading-indicator-inspect" class="text-center">
+                        <span>Loading</span><span class="dots">...</span>
+                    </div>
+                    <!-- Inspect Data will go here after loading -->
+                    <div id="inspect-content" style="display: none;">
+                        <!-- Dynamically filled content will go here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Routing Table Modal -->
+    <div class="modal fade" id="routingModal" tabindex="-1" aria-labelledby="routingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="routingModalLabel">Routing Table</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Show Loading initially -->
+                    <div id="loading-indicator-routing" class="text-center">
+                        <span>Loading</span><span class="dots">...</span>
+                    </div>
+                    <!-- Routing Table will go here after loading -->
+                    <div id="routing-table-content" style="display: none;">
+                        <!-- Dynamically filled content will go here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BGP Neighbor Modal -->
+    <div class="modal fade" id="neighborModal" tabindex="-1" aria-labelledby="neighborModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="neighborModalLabel">Neighbors (BGP)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Show Loading initially -->
+                    <div id="loading-indicator-neighbor" class="text-center">
+                        <span>Loading</span><span class="dots">...</span>
+                    </div>
+                    <!-- BGP Neighbors will go here after loading -->
+                    <div id="bgp-neighbors-content" style="display: none;">
+                        <!-- Dynamically filled content will go here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- sFlow Agent Details Modal -->
+    <div class="modal fade" id="sflowAgentInfoModal" tabindex="-1" aria-labelledby="sflowAgentInfoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="sflowAgentInfoModalLabel">sFlow Agent Details (Static Snapshot)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Show Loading initially -->
+                    <div id="loading-indicator-sflow" class="text-center">
+                        <span>Loading</span><span class="dots">...</span>
+                    </div>
+                    <!-- sFlow Details will go here after loading -->
+                    <div id="sflow-agent-content" style="display: none;">
+                        <!-- Dynamically filled content will go here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="successModalLabel">Success</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Ticket successfully created. See Ticket tab!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ticket Creation Modal (New) -->
+    <div class="modal fade" id="ticketModal" tabindex="-1" aria-labelledby="ticketModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ticketModalLabel">Create Ticket</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="ticketForm">
+                        <div class="mb-3">
+                            <label for="ticketNarrative" class="form-label">Ticket Narrative</label>
+                            <textarea class="form-control" id="ticketNarrative" rows="4" placeholder="Enter narrative here..."></textarea>
+                        </div>
+                        <input type="hidden" id="ticketNeid">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" onclick="submitTicket()">Submit Ticket</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const evtSource = new EventSource('/api/v1/metrics/ALL/ifadminstatus,ifoperstatus');
+        let openAgents = new Set();
+
+        evtSource.onmessage = function(event) {
+            const newMetrics = JSON.parse(event.data);
+            
+            $("#data-body").empty();
+            
+            let groupedMetrics = {};
+            newMetrics.forEach(metric => {
+                if (!groupedMetrics[metric.agent]) {
+                    groupedMetrics[metric.agent] = [];
+                }
+                groupedMetrics[metric.agent].push(metric);
+            });
+
+            let tableRows = "";
+            
+            Object.keys(groupedMetrics).forEach(agent => {
+                let agentId = agent.replace(/\./g, "-");
+                let isOpen = openAgents.has(agentId);
+                
+                tableRows += `
+                    <tr class="agent-row" data-agent="${agentId}">
+                        <td><strong>${agent}</strong></td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" onclick="toggleRows(event, '${agentId}')">
+                                <span id="icon-${agentId}" class="bi ${isOpen ? 'bi-dash-circle' : 'bi-plus-circle'}"></span>
+                            </button>
+                            <button class="btn btn-info btn-sm" onclick="inspectData(event, '${agent}')">
+                                <span class="bi bi-info-circle"></span>
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="routingData(event, '${agent}')">
+                                <span class="bi bi-table"></span>
+                            </button>
+                            <button class="btn btn-warning btn-sm" onclick="neighborData(event, '${agent}')">
+                                <span class="bi bi-people"></span>
+                            </button>
+                            <button class="btn btn-dark btn-sm" onclick="sflowAgentInfo(event, '${agent}')">
+                                <span class="bi bi-activity"></span>
+                            </button>
+                            <button class="btn btn-success btn-sm" onclick="openTicketModal(event, '${agent}')">
+                                <span class="bi bi-upload"></span> Create Ticket
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                
+                groupedMetrics[agent].forEach(metric => {
+                    tableRows += `
+                        <tr class="agent-${agentId} data-row" style="display: ${isOpen ? 'table-row' : 'none'};">
+                            <td colspan="2">
+                                <div class="p-2 border rounded bg-light">
+                                    <strong>ifindex:</strong> ${metric.dataSource}<br>
+                                    <strong>${metric.metricName}:</strong> ${metric.metricValue}<br>
+                                    <strong>Last Update:</strong> ${metric.lastUpdate} ms
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+            });
+            
+            $("#data-body").html(tableRows);
+        };
+
+        function toggleRows(event, agentId) {
+            event.stopPropagation();
+            if (openAgents.has(agentId)) {
+                openAgents.delete(agentId);
+                $(`.agent-${agentId}`).hide();
+                $(`#icon-${agentId}`).removeClass("bi-dash-circle").addClass("bi-plus-circle");
+            } else {
+                openAgents.add(agentId);
+                $(`.agent-${agentId}`).show();
+                $(`#icon-${agentId}`).removeClass("bi-plus-circle").addClass("bi-dash-circle");
+            }
+        }
+
+        // Helper function to pretty-print JSON responses using Bootstrap styling.
+        function prettyPrintJSON(data) {
+            let formatted;
+            try {
+                // Try to parse as JSON (if data is a JSON string)
+                let jsonObj = typeof data === 'string' ? JSON.parse(data) : data;
+                formatted = JSON.stringify(jsonObj, null, 2);
+            } catch (e) {
+                // If not JSON, show the original data
+                formatted = data;
+            }
+            // Return a formatted pre block with Bootstrap classes
+            return `<pre class="bg-light p-3 rounded border" style="max-height:400px; overflow:auto;">${formatted}</pre>`;
+        }
+
+        async function inspectData(event, agentId) {
+            event.stopPropagation();
+
+            document.getElementById('loading-indicator-inspect').style.display = 'block';
+            document.getElementById('inspect-content').style.display = 'none';
+
+            const modal = new bootstrap.Modal(document.getElementById('inspectModal'));
+            modal.show();
+
+            try {
+                const response = await fetch(`/api/v1/metrics/${agentId}/inspect/facts`);
+                
+                if (!response.ok) {
+                    throw new Error("Failed to fetch data");
+                }
+                
+                const agentData = await response.json();
+                
+                document.getElementById('loading-indicator-inspect').style.display = 'none';
+                document.getElementById('inspect-content').style.display = 'block';
+
+                const formattedData = formatFactsJsonData(agentData);
+                document.getElementById('inspect-content').innerHTML = formattedData;
+            }
+            catch (error) {
+                console.error("Error fetching inspect data:", error);
+                alert("An error occurred while fetching the data.");
+            }
+        }
+
+        async function routingData(event, agentId) {
+            event.stopPropagation();
+
+            document.getElementById('loading-indicator-routing').style.display = 'block';
+            document.getElementById('routing-table-content').style.display = 'none';
+
+            const modal = new bootstrap.Modal(document.getElementById('routingModal'));
+            modal.show();
+
+            try {
+                const response = await fetch(`/api/v1/metrics/${agentId}/inspect/routing`);
+                
+                if (!response.ok) {
+                    throw new Error("Failed to fetch data");
+                }
+
+                const data = await response.text();
+
+                document.getElementById('loading-indicator-routing').style.display = 'none';
+                document.getElementById('routing-table-content').style.display = 'block';
+
+                document.getElementById('routing-table-content').innerHTML = "<pre>" + data + "</pre>";
+            }
+            catch (error) {
+                console.error("Error fetching data:", error);
+                alert("An error occurred while fetching the data.");
+            }
+        }
+
+        async function neighborData(event, agentId) {
+            event.stopPropagation();
+
+            document.getElementById('loading-indicator-neighbor').style.display = 'block';
+            document.getElementById('bgp-neighbors-content').style.display = 'none';
+
+            const modal = new bootstrap.Modal(document.getElementById('neighborModal'));
+            modal.show();
+
+            try {
+                const response = await fetch(`/api/v1/metrics/${agentId}/inspect/neighbors`);
+                
+                if (!response.ok) {
+                    throw new Error("Failed to fetch data");
+                }
+
+                const data = await response.text();
+
+                document.getElementById('loading-indicator-neighbor').style.display = 'none';
+                document.getElementById('bgp-neighbors-content').style.display = 'block';
+
+                document.getElementById('bgp-neighbors-content').innerHTML = "<pre>" + data + "</pre>";
+            }
+            catch (error) {
+                console.error("Error fetching data:", error);
+                alert("An error occurred while fetching the data.");
+            }
+        }
+
+        async function sflowAgentInfo(event, agentId) {
+            event.stopPropagation();
+
+            document.getElementById('loading-indicator-sflow').style.display = 'block';
+            document.getElementById('sflow-agent-content').style.display = 'none';
+
+            const modal = new bootstrap.Modal(document.getElementById('sflowAgentInfoModal'));
+            modal.show();
+
+            try {
+                const response = await fetch(`/api/v1/metrics/${agentId}/status`);
+                
+                if (!response.ok) {
+                    throw new Error("Failed to fetch sFlow agent information");
+                }
+                
+                const data = await response.text();
+
+                document.getElementById('loading-indicator-sflow').style.display = 'none';
+                document.getElementById('sflow-agent-content').style.display = 'block';
+
+                document.getElementById('sflow-agent-content').innerHTML = prettyPrintJSON(data);
+            }
+            catch (error) {
+                console.error("Error fetching sFlow information:", error);
+                alert("An error occurred while fetching sFlow information.");
+            }
+        }
+
+        // New function to open the Ticket Modal and set the NEID
+        function openTicketModal(event, agentId) {
+            event.stopPropagation();
+            document.getElementById('ticketNeid').value = agentId;
+            document.getElementById('ticketNarrative').value = "";
+            const modal = new bootstrap.Modal(document.getElementById('ticketModal'));
+            modal.show();
+        }
+
+        // New function to submit the ticket with the narrative
+        async function submitTicket() {
+            const agentId = document.getElementById('ticketNeid').value;
+            const narrative = document.getElementById('ticketNarrative').value.trim();
+
+            if (!narrative) {
+                alert("Please enter a ticket narrative.");
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/v1/tickets`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ neid: agentId, ticketNarrative: narrative })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to send ticket data");
+                }
+
+                const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                successModal.show();
+                bootstrap.Modal.getInstance(document.getElementById('ticketModal')).hide();
+            } catch (error) {
+                console.error("Error submitting ticket:", error);
+                alert("An error occurred while submitting the ticket.");
+            }
+        }
+
+        function formatFactsJsonData(data) {
+            if (!data || typeof data !== 'object') {
+                return "<div class='alert alert-danger'>Invalid or empty data.</div>";
+            }
+
+            let htmlContent = "";
+            
+            if (data.ansible_net_hostname) {
+                htmlContent += `
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <strong>Hostname</strong>
+                        </div>
+                        <div class="card-body">
+                            ${data.ansible_net_hostname}
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (data.ansible_net_config) {
+                htmlContent += `
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <strong>Configuration</strong>
+                        </div>
+                        <div class="card-body">
+                            <pre>${data.ansible_net_config}</pre>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (data.ansible_net_version) {
+                htmlContent += `
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <strong>System Version</strong>
+                        </div>
+                        <div class="card-body">
+                            ${data.ansible_net_version}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (data.ansible_net_system) {
+                htmlContent += `
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <strong>System</strong>
+                        </div>
+                        <div class="card-body">
+                            ${data.ansible_net_system}
+                        </div>
+                    </div>
+                `;
+            }
+
+            return htmlContent;
+        }
+
+        evtSource.onerror = function (error) {
+            console.error("Error receiving updates", error);
+        };
+    </script>
+{% endblock %}
