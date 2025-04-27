@@ -1,4 +1,5 @@
 ---
+permalink: /shepherdnet/
 layout: page
 ---
 # shepherdnet: Real-Time Monitoring and Control
