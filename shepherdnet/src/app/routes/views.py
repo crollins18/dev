@@ -6,7 +6,9 @@ app_data = {
     "title": "ShepherdNet",
     "description": "A web UI to monitor network status for troubles",
     "author": "Caleb Rollins",
-    "topo_filepath": "bgp-frr.clab.mermaid",
+    "topo_filepath": "shepherdnet.clab.mermaid",
+    "router_username": "frruser",
+    "router_password": "frrpassword",
 }
 
 @views_bp.route("/")
@@ -19,7 +21,7 @@ def dashboard():
 
 @views_bp.route("/topology")
 def topology():
-    with open(app_data['topo_filepath'], "r", encoding="utf-8") as f:
+    with open(app_data['topo_filepath'], "r") as f:
         mermaid_code = f.read()
     return render_template("topology.html", app_data=app_data, mermaid_code=mermaid_code)
 

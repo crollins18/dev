@@ -1,9 +1,0 @@
----
-- name: Basic Inspection
-  hosts: frr_devices
-  gather_facts: true
-  tasks:
-    - name: Collect all information from the device
-      frr.frr.frr_facts:
-        gather_subset:
-          - all

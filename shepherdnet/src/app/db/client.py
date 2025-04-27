@@ -4,7 +4,6 @@ import json
 
 client = MongoClient('mongodb', 27017)
 db = client['db']
-db['tickets']
 
 def get_tickets():
     cursor = db.tickets.find()

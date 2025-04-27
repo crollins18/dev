@@ -1,6 +1,1 @@
 *.bak
-config/leaf1/bgpd.conf
-config/leaf2/bgpd.conf
-config/leaf3/bgpd.conf
-config/spine1/bgpd.conf
-config/spine2/bgpd.conf

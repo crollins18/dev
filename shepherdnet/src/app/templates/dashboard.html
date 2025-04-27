@@ -165,7 +165,7 @@
             let tableRows = "";
             
             Object.keys(groupedMetrics).forEach(agent => {
-                let agentId = agent.replace(/\./g, "-"); 
+                let agentId = agent.replace(/\./g, "-");
                 let isOpen = openAgents.has(agentId);
                 
                 tableRows += `
