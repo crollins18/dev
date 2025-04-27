@@ -1,0 +1,10 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+    <div class="jumbotron">
+        <h1 class="display-4">{{ app_data['title'] }}</h1>
+        <p class="lead">by {{ app_data['author'] }}</p>
+        <hr class="my-4">
+        <p>Navigate to the Dashboard tab to get started!</p>
+    </div>
+{% endblock %}

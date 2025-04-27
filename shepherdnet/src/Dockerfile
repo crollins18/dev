@@ -9,7 +9,7 @@ WORKDIR /src
 
 # Install system dependencies including build tools, Python headers, and required libraries
 RUN apk add --no-cache \
-    python3 py3-pip python3-dev py3-netaddr \
+    python3 python3-pip python3-dev python3-netaddr \
     build-base libffi-dev openssl-dev libssh-dev
 
 # Create a Python virtual environment to avoid modifying the system-wide Python

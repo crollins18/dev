@@ -1,0 +1,4 @@
+---
+collections:
+  - name: frr.frr
+    source: https://galaxy.ansible.com
